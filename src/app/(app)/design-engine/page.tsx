@@ -3,6 +3,7 @@ import { matchTemplates } from "@/lib/match-template";
 import { designTemplates, templateCategories, type TemplateCategory } from "@/lib/design-templates";
 import { IconSparkle, IconArrowRight } from "@/components/icons";
 import { TemplateThumb } from "@/components/TemplateThumb";
+import { createDesignAction } from "./actions";
 import shell from "@/components/AppShell.module.css";
 import styles from "./design-engine.module.css";
 
@@ -18,8 +19,13 @@ export default async function DesignEnginePage({
 
   return (
     <div>
-      <h1 className={shell.h1} style={{ marginBottom: 4 }}>Design Engine</h1>
-      <div className={styles.h1sub}>Describe what you need — get a finished design from our library, instantly.</div>
+      <div className={shell.topline}>
+        <h1 className={shell.h1}>
+          Design Engine
+          <span className={shell.h1sub}>Describe what you need, then design it yourself in the studio — nothing reaches a client until you send it.</span>
+        </h1>
+        <Link href="/design-engine/studio" className={shell.btnGhost}>My Designs →</Link>
+      </div>
 
       <div className={styles.promptPanel}>
         <div className={styles.badgeRow}>
@@ -74,7 +80,11 @@ export default async function DesignEnginePage({
               <div className={styles.tname}>{t.name}</div>
               <div className={styles.tmeta}>
                 <span className={styles.tcat}>{t.category}</span>
-                <Link className={styles.use} href={`/design-engine/use/${t.id}?q=${encodeURIComponent(q)}`}>Use →</Link>
+                <form action={createDesignAction}>
+                  <input type="hidden" name="templateId" value={t.id} />
+                  <input type="hidden" name="promptText" value={q} />
+                  <button className={styles.use} type="submit">Design this →</button>
+                </form>
               </div>
             </div>
           </div>

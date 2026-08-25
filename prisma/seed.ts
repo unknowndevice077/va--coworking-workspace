@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.designApproval.deleteMany();
+  await prisma.design.deleteMany();
   await prisma.designTemplate.deleteMany();
   await prisma.message.deleteMany();
   await prisma.messageThread.deleteMany();
@@ -143,12 +144,33 @@ async function main() {
     });
   }
 
+  const sentTemplate = designTemplates.find((t) => t.id === "social-bold-announcement")!;
   await prisma.designApproval.create({
     data: {
       clientId: brightleaf.id,
-      templateId: "social-bold-announcement",
+      templateId: sentTemplate.id,
       status: "PENDING",
       promptText: "Instagram post announcing our fall bakery menu",
+      headline: "Fall menu is here",
+      sub: sentTemplate.sub,
+      tag: sentTemplate.tag,
+      hue: sentTemplate.hue,
+    },
+  });
+
+  // A private draft, sitting in the VA's own studio — not sent to anyone,
+  // to demonstrate the "My Designs" library on a fresh seed.
+  const draftTemplate = designTemplates.find((t) => t.id === "flyer-open-house")!;
+  await prisma.design.create({
+    data: {
+      templateId: draftTemplate.id,
+      name: "Coastal Realty — open house flyer",
+      headline: "Open House · Saturday",
+      sub: draftTemplate.sub,
+      tag: draftTemplate.tag,
+      hue: draftTemplate.hue,
+      promptText: "open house flyer for coastal realty",
+      status: "DRAFT",
     },
   });
 

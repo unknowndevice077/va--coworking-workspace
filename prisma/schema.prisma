@@ -116,6 +116,28 @@ model DesignTemplate {
   svg      String
 
   approvals DesignApproval[]
+  designs   Design[]
+}
+
+// A VA's private, in-progress design — the "Canva-like" studio draft. Never
+// queried from any client-facing route (/p/[token] only ever reads
+// DesignApproval); a Design becomes visible to a client only once the VA
+// explicitly sends it, which snapshots its content into a DesignApproval.
+model Design {
+  id         String         @id @default(cuid())
+  templateId String
+  template   DesignTemplate @relation(fields: [templateId], references: [id])
+  name       String
+  headline   String
+  sub        String?
+  tag        String?
+  hue        Int
+  promptText String         @default("")
+  status     String         @default("DRAFT") // DRAFT | SENT
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  approvals DesignApproval[]
 }
 
 model DesignApproval {
@@ -124,6 +146,12 @@ model DesignApproval {
   client     Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
   templateId String
   template   DesignTemplate @relation(fields: [templateId], references: [id])
+  designId   String?
+  design     Design?        @relation(fields: [designId], references: [id], onDelete: SetNull)
+  headline   String
+  sub        String?
+  tag        String?
+  hue        Int
   status     String         @default("PENDING")
   promptText String
   createdAt  DateTime       @default(now())

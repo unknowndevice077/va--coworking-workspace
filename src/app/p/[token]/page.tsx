@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { designTemplates } from "@/lib/design-templates";
-import { guessHeadline } from "@/lib/match-template";
 import { approveDesignAction, requestChangesAction } from "./actions";
 import { IconFile } from "@/components/icons";
 import { TemplateThumb } from "@/components/TemplateThumb";
@@ -67,8 +66,8 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             {client.designApprovals.length === 0 && <div style={{ color: "var(--sub)", fontSize: 13 }}>No designs yet.</div>}
             {client.designApprovals.map((approval) => {
               const template = designTemplates.find((t) => t.id === approval.templateId);
-              const previewTemplate = template && approval.promptText.trim()
-                ? { ...template, headline: guessHeadline(approval.promptText) }
+              const previewTemplate = template
+                ? { ...template, headline: approval.headline, sub: approval.sub ?? undefined, tag: approval.tag ?? undefined, hue: approval.hue }
                 : template;
               return (
                 <div className={styles.approval} key={approval.id}>
@@ -77,7 +76,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
                   </div>
                   <div className={styles.appinfo}>
                     <div className={styles.appname}>{template?.name ?? "Design"}</div>
-                    <div className={styles.appmeta}>From the Smart Templates library · &quot;{approval.promptText}&quot;</div>
+                    <div className={styles.appmeta}>From your VA&apos;s design studio</div>
                     {approval.status === "PENDING" ? (
                       <div className={styles.appbtns}>
                         <form action={approveDesignAction}>
