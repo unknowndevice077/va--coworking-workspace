@@ -1,0 +1,60 @@
+.cal {
+  display: grid;
+  grid-template-columns: 64px repeat(5, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.cell {
+  background: var(--card);
+  min-height: 30px;
+}
+.dayhead {
+  background: var(--card);
+  padding: 8px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--sub);
+  letter-spacing: 0.03em;
+}
+.timelbl {
+  background: var(--bg);
+  padding: 4px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--sub);
+  text-align: right;
+}
+.allday {
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chip {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-radius: 3px;
+  padding: 3px 6px;
+  line-height: 1.3;
+}
+.evt {
+  margin: 3px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  border-left: 2.5px solid var(--accent);
+}
+.et {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.3;
+}
+.es {
+  font-size: 10px;
+  color: var(--sub);
+  margin-top: 1px;
+}

@@ -1,0 +1,150 @@
+.shell2 {
+  display: flex;
+  height: calc(100vh - 56px);
+  margin: -28px -34px;
+  border-top: 1px solid var(--border);
+}
+.threads {
+  width: 300px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+.thh {
+  padding: 20px 18px 12px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+.thread {
+  display: flex;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+}
+.threadOn {
+  background: var(--accent-soft);
+}
+.dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.threadOn .dot {
+  background: var(--accent-fill);
+  color: #fff;
+}
+.tinfo {
+  flex: 1;
+  min-width: 0;
+}
+.trow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tname {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.ttime {
+  font-size: 10.5px;
+  color: var(--sub);
+}
+.tsnip {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thpane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.hd {
+  padding: 18px 26px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hdnm {
+  font-size: 14px;
+  font-weight: 700;
+}
+.hdrole {
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.msgs {
+  flex: 1;
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+.msg {
+  max-width: 70%;
+  padding: 11px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.msgIn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+}
+.msgOut {
+  background: var(--accent-fill);
+  color: #fff;
+  align-self: flex-end;
+}
+.mtime {
+  font-size: 10px;
+  color: var(--sub);
+  margin-top: 6px;
+}
+.msgOut .mtime {
+  color: oklch(0.86 0.04 255);
+}
+.composer {
+  padding: 16px 26px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+.composer input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--card);
+  font-family: inherit;
+}
+.sendbtn {
+  background: var(--accent-fill);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}

@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  role         String      @default("VA")
+  createdAt    DateTime    @default(now())
+  timeEntries  TimeEntry[]
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  contactName  String
+  contactEmail String
+  status       String   @default("ACTIVE")
+  monthlyValueCents Int @default(0)
+  services     String
+  portalToken  String   @unique @default(cuid())
+  createdAt    DateTime @default(now())
+
+  projects        Project[]
+  invoices        Invoice[]
+  events          CalendarEvent[]
+  threads         MessageThread[]
+  files           ClientFile[]
+  designApprovals DesignApproval[]
+}
+
+model Project {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title     String
+  status    String    @default("TODO")
+  dueLabel  String?
+  createdAt DateTime  @default(now())
+
+  timeEntries TimeEntry[]
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  minutes   Int
+  date      DateTime @default(now())
+  note      String?
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  number      String    @unique
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  amountCents Int
+  status      String    @default("DRAFT")
+  dueLabel    String?
+  createdAt   DateTime  @default(now())
+}
+
+model CalendarEvent {
+  id       String   @id @default(cuid())
+  clientId String?
+  client   Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  title    String
+  day      String
+  startHour Float
+  endHour   Float
+  allDay    Boolean @default(false)
+}
+
+model MessageThread {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id        String        @id @default(cuid())
+  threadId  String
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  fromVA    Boolean       @default(false)
+  body      String
+  createdAt DateTime      @default(now())
+}
+
+model ClientFile {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  filename  String
+  sizeLabel String
+  createdAt DateTime @default(now())
+}
+
+model DesignTemplate {
+  id       String @id @default(cuid())
+  name     String
+  category String
+  keywords String
+  svg      String
+
+  approvals DesignApproval[]
+}
+
+model DesignApproval {
+  id         String         @id @default(cuid())
+  clientId   String
+  client     Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  templateId String
+  template   DesignTemplate @relation(fields: [templateId], references: [id])
+  status     String         @default("PENDING")
+  promptText String
+  createdAt  DateTime       @default(now())
+}
