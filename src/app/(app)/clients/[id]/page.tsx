@@ -46,7 +46,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </Link>
       </div>
 
-      <div className={ui.statsThree}>
+      <div className={`${ui.statsThree} staggerChildren`}>
         <div className={ui.stat}>
           <div className={ui.statLbl}>STATUS</div>
           <div className={ui.statVal} style={{ fontSize: 16 }}>

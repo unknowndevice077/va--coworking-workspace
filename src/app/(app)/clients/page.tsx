@@ -69,6 +69,7 @@ export default async function ClientsPage({
         ))}
       </div>
 
+      <div className={ui.tableWrap}>
       <table className={ui.table}>
         <thead>
           <tr>
@@ -122,6 +123,7 @@ export default async function ClientsPage({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

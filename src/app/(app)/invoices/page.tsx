@@ -49,7 +49,7 @@ export default async function InvoicesPage() {
         </Link>
       </div>
 
-      <div className={ui.statsThree}>
+      <div className={`${ui.statsThree} staggerChildren`}>
         <div className={ui.stat}>
           <div className={ui.statLbl}>OUTSTANDING</div>
           <div className={ui.statVal}>{money(outstanding)}</div>
@@ -64,6 +64,7 @@ export default async function InvoicesPage() {
         </div>
       </div>
 
+      <div className={ui.tableWrap}>
       <table className={ui.table}>
         <thead>
           <tr>
@@ -95,6 +96,7 @@ export default async function InvoicesPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

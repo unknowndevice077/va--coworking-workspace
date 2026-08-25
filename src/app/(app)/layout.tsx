@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { Sidebar } from "@/components/Sidebar";
+import { PageTransition } from "@/components/PageTransition";
 import styles from "@/components/AppShell.module.css";
 
 function initialsOf(name: string) {
@@ -19,7 +20,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className={styles.shell}>
       <Sidebar userName={user.name} userInitials={initialsOf(user.name)} />
-      <div className={styles.main}>{children}</div>
+      <div className={styles.main}>
+        <PageTransition>{children}</PageTransition>
+      </div>
     </div>
   );
 }

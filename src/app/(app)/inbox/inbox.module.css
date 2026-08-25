@@ -10,6 +10,28 @@
   border-right: 1px solid var(--border);
   overflow-y: auto;
 }
+
+@media (max-width: 900px) {
+  .shell2 {
+    margin: -18px -16px;
+    height: auto;
+    flex-direction: column;
+  }
+  .threads {
+    width: auto;
+    max-height: 260px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .thpane {
+    min-height: 420px;
+  }
+}
+@media (max-width: 480px) {
+  .shell2 {
+    margin: -14px -12px;
+  }
+}
 .thh {
   padding: 20px 18px 12px;
   font-family: "Source Serif 4", Georgia, serif;
@@ -21,8 +43,13 @@
   gap: 10px;
   padding: 12px 18px;
   border-top: 1px solid var(--border);
+  transition: background-color 0.15s ease;
 }
-.threadOn {
+.thread:hover {
+  background: color-mix(in oklch, var(--card) 85%, var(--accent) 15%);
+}
+.threadOn,
+.threadOn:hover {
   background: var(--accent-soft);
 }
 .dot {
@@ -102,6 +129,13 @@
   border-radius: 8px;
   font-size: 13px;
   line-height: 1.5;
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (max-width: 640px) {
+  .msg {
+    max-width: 85%;
+  }
 }
 .msgIn {
   background: var(--card);
@@ -136,6 +170,12 @@
   color: var(--text);
   background: var(--card);
   font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.composer input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .sendbtn {
   background: var(--accent-fill);
@@ -147,4 +187,9 @@
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sendbtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -4px color-mix(in oklch, var(--accent-fill) 55%, transparent);
 }

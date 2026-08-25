@@ -54,12 +54,12 @@ export default async function ProjectsPage() {
         {STAGES.map((stage) => {
           const items = projects.filter((p) => p.status === stage.key);
           return (
-            <div key={stage.key}>
+            <div key={stage.key} className={styles.colwrap}>
               <div className={styles.colhead}>
                 <span className={styles.colname}>{stage.label.toUpperCase()}</span>
                 <span className={styles.colcount}>{items.length}</span>
               </div>
-              <div className={styles.cards}>
+              <div className={`${styles.cards} staggerChildren`}>
                 {items.map((p) => {
                   const minutes = p.timeEntries.reduce((sum, e) => sum + e.minutes, 0);
                   const idx = STAGES.findIndex((s) => s.key === stage.key);

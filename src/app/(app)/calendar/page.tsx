@@ -39,6 +39,7 @@ export default async function CalendarPage() {
         </button>
       </div>
 
+      <div className={styles.calWrap}>
       <div className={styles.cal}>
         <div className={styles.cell} />
         {DAYS.map((d) => (
@@ -80,6 +81,7 @@ export default async function CalendarPage() {
             })}
           </Fragment>
         ))}
+      </div>
       </div>
     </div>
   );

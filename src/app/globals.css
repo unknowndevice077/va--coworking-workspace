@@ -72,6 +72,10 @@ body {
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
@@ -88,4 +92,111 @@ h3,
 a {
   color: var(--accent);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
+
+button {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---------- Motion system ---------- */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animIn {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animInFast {
+  animation: fadeInUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fadeIn {
+  animation: fadeIn 0.25s ease both;
+}
+.staggerChildren > * {
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.staggerChildren > *:nth-child(1) { animation-delay: 0.01s; }
+.staggerChildren > *:nth-child(2) { animation-delay: 0.03s; }
+.staggerChildren > *:nth-child(3) { animation-delay: 0.05s; }
+.staggerChildren > *:nth-child(4) { animation-delay: 0.07s; }
+.staggerChildren > *:nth-child(5) { animation-delay: 0.09s; }
+.staggerChildren > *:nth-child(6) { animation-delay: 0.11s; }
+.staggerChildren > *:nth-child(7) { animation-delay: 0.13s; }
+.staggerChildren > *:nth-child(8) { animation-delay: 0.15s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Responsive breakpoint reference ----------
+   Mobile:  <= 640px
+   Tablet:  <= 900px  (sidebar collapses to a drawer)
+   Desktop: > 900px
+------------------------------------------------------- */

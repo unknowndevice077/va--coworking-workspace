@@ -1,9 +1,19 @@
+.calWrap {
+  overflow-x: auto;
+}
+
 .cal {
   display: grid;
   grid-template-columns: 64px repeat(5, 1fr);
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
+}
+
+@media (max-width: 720px) {
+  .cal {
+    min-width: 640px;
+  }
 }
 .cell {
   background: var(--card);
@@ -46,6 +56,11 @@
   border-radius: 4px;
   background: var(--accent-soft);
   border-left: 2.5px solid var(--accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.evt:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.3);
 }
 .et {
   font-size: 11px;

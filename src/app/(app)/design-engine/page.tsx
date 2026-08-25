@@ -63,7 +63,7 @@ export default async function DesignEnginePage({
         ))}
       </div>
 
-      <div className={styles.results}>
+      <div className={`${styles.results} staggerChildren`}>
         {results.map((t) => (
           <div className={styles.tcard} key={t.id}>
             <div className={styles.thumb} style={{ background: `oklch(0.92 0.045 ${t.hue})` }}>

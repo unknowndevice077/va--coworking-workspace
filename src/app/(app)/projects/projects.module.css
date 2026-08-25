@@ -3,6 +3,20 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
+
+@media (max-width: 900px) {
+  .board {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 78vw);
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x proximity;
+  }
+  .colwrap {
+    scroll-snap-align: start;
+  }
+}
 .colhead {
   display: flex;
   align-items: center;
@@ -33,6 +47,12 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 13px 14px;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.25);
+  border-color: var(--accent);
 }
 .ctag {
   display: inline-block;
@@ -74,6 +94,10 @@
   cursor: pointer;
   font-family: inherit;
   padding: 0;
+  transition: opacity 0.15s ease;
+}
+.ctime:hover {
+  opacity: 0.7;
 }
 .ctime svg {
   width: 11px;
@@ -95,9 +119,11 @@
   padding: 5px 0;
   cursor: pointer;
   font-family: inherit;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 .moveBtn:hover {
-  color: var(--text);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 .timer {
   display: flex;

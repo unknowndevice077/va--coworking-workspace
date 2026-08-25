@@ -44,7 +44,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
         <div style={{ fontSize: 12.5, fontWeight: 600 }}>{client.contactName}</div>
       </div>
 
-      <div className={styles.main}>
+      <div className={`${styles.main} animIn`}>
         <div>
           <h1 className={styles.h1}>Welcome back, {client.contactName.split(" ")[0]}</h1>
           <div className={styles.panel}>

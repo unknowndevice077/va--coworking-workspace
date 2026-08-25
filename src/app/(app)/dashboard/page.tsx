@@ -53,7 +53,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className={ui.stats}>
+      <div className={`${ui.stats} staggerChildren`}>
         <div className={ui.stat}>
           <div className={ui.statLbl}>ACTIVE CLIENTS</div>
           <div className={ui.statVal}>{clientCount}</div>
