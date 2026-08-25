@@ -133,10 +133,10 @@
 }
 .thumb {
   width: 128px;
-  height: 100px;
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid var(--border);
 }
 .appinfo {
   flex: 1;

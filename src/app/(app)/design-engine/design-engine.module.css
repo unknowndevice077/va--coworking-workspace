@@ -108,6 +108,7 @@
 .results {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
   gap: 14px;
 }
 @media (max-width: 900px) {
@@ -133,14 +134,12 @@
   border-color: var(--accent);
 }
 .thumb {
-  height: 132px;
   overflow: hidden;
-}
-.thumb > div {
+  border-bottom: 1px solid var(--border);
   transition: transform 0.25s ease;
 }
-.tcard:hover .thumb > div {
-  transform: scale(1.04);
+.tcard:hover .thumb {
+  transform: scale(1.025);
 }
 .tbody {
   padding: 12px 14px;
@@ -215,21 +214,29 @@
   gap: 24px;
   flex-wrap: wrap;
 }
+.canvasCol {
+  flex: 1 1 480px;
+  min-width: 280px;
+  max-width: 700px;
+  position: sticky;
+  top: 24px;
+}
 .canvasWrap {
-  width: 320px;
-  height: 246px;
-  flex-shrink: 0;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);
   box-shadow: 0 14px 32px -18px rgba(0, 0, 0, 0.35);
-  position: sticky;
-  top: 24px;
+}
+.canvasHint {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 10px;
+  text-align: center;
 }
 .studioPanel {
-  flex: 1;
-  min-width: 280px;
-  max-width: 440px;
+  flex: 0 0 260px;
+  min-width: 240px;
+  max-width: 300px;
 }
 .tabRow {
   display: flex;

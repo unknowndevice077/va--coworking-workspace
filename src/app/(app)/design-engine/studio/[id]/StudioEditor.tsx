@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useRef, useState, useActionState } from "react";
 import Link from "next/link";
-import { TemplateThumb } from "@/components/TemplateThumb";
+import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
+import { ExportCanvas } from "@/components/graphic/ExportCanvas";
+import { findTemplate } from "@/lib/graphic-templates";
 import { updateDesignAction, sendDesignAction, deleteDesignAction } from "../../actions";
-import type { DesignTemplate } from "@/lib/design-templates";
 import shell from "@/components/AppShell.module.css";
 import loginStyles from "@/app/login/login.module.css";
 import styles from "../../design-engine.module.css";
@@ -12,49 +13,75 @@ import styles from "../../design-engine.module.css";
 // A curated color set (not a full picker) — keeps every design looking like
 // it came from a professional template, matching the honest "Smart
 // Templates, not generative AI" positioning of the rest of the engine.
-const PALETTE = [340, 255, 220, 190, 150, 120, 95, 78, 45, 30, 0, 275];
+const PALETTE_HUES = [150, 265, 25, 210, 255, 190, 235, 340, 45, 95, 20, 300];
 
 type DesignRow = {
   id: string;
   name: string;
-  headline: string;
-  sub: string | null;
-  tag: string | null;
+  fields: Record<string, string>;
   hue: number;
   status: string;
+  templateId: string;
 };
 
 export function StudioEditor({
   design,
-  template,
   clients,
   approvals,
 }: {
   design: DesignRow;
-  template: DesignTemplate;
   clients: { id: string; name: string }[];
   approvals: { id: string; status: string; clientName: string }[];
 }) {
+  const template = findTemplate(design.templateId);
+
   const [tab, setTab] = useState<"edit" | "send">("edit");
   const [name, setName] = useState(design.name);
-  const [headline, setHeadline] = useState(design.headline);
-  const [sub, setSub] = useState(design.sub ?? "");
-  const [tag, setTag] = useState(design.tag ?? "");
+  const [fields, setFields] = useState<Record<string, string>>(design.fields);
   const [hue, setHue] = useState(design.hue);
+  const [downloading, setDownloading] = useState(false);
+
+  const exportNodeRef = useRef<HTMLDivElement | null>(null);
+  const exportDocRef = useRef<Document | null>(null);
 
   const [saveState, saveAction, savePending] = useActionState(updateDesignAction, undefined);
   const [sendState, sendActionFn, sendPending] = useActionState(sendDesignAction, undefined);
 
-  const showSub = template.category !== "Logo";
-  const showTag = template.category === "Social Post" || template.category === "Flyer";
+  if (!template) {
+    return (
+      <div className={styles.emptyStudio}>
+        This design&apos;s template no longer exists in the library. <Link href="/design-engine/studio">Back to My Designs</Link>
+      </div>
+    );
+  }
 
-  const preview: DesignTemplate = {
-    ...template,
-    headline: headline || "Your headline here",
-    sub: showSub ? sub || undefined : undefined,
-    tag: showTag ? tag || undefined : undefined,
-    hue,
-  };
+  const handleEdit = (key: string, value: string) => setFields((prev) => ({ ...prev, [key]: value }));
+
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      const node = exportNodeRef.current;
+      const doc = exportDocRef.current;
+      if (!node || !doc) {
+        alert("Still getting the canvas ready — try again in a second.");
+        return;
+      }
+      const { default: html2canvas } = await import("html2canvas");
+      await doc.fonts.ready;
+      const canvas = await html2canvas(node, { useCORS: true, backgroundColor: "#ffffff", scale: 2 });
+      const link = document.createElement("a");
+      link.download = `${(name || template!.name).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (e) {
+      console.error(e);
+      alert("Download failed — please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  const fieldsJson = JSON.stringify(fields);
 
   return (
     <div>
@@ -69,9 +96,26 @@ export function StudioEditor({
       </div>
 
       <div className={styles.studioLayout}>
-        <div className={styles.canvasWrap}>
-          <TemplateThumb template={preview} variant="hero" />
+        <div className={styles.canvasCol}>
+          <div className={styles.canvasWrap}>
+            <ScaledCanvas width={template.width} height={template.height}>
+              <template.Component values={fields} hue={hue} editable={tab === "edit"} onEdit={handleEdit} />
+            </ScaledCanvas>
+          </div>
+          {tab === "edit" && <div className={styles.canvasHint}>Click any text on the design to edit it in place.</div>}
         </div>
+
+        {/* Off-screen, always full-resolution and non-editable — this is what actually gets captured for PNG export. */}
+        <ExportCanvas
+          width={template.width}
+          height={template.height}
+          onReady={(node, doc) => {
+            exportNodeRef.current = node;
+            exportDocRef.current = doc;
+          }}
+        >
+          <template.Component values={fields} hue={hue} editable={false} />
+        </ExportCanvas>
 
         <div className={styles.studioPanel}>
           <div className={styles.tabRow}>
@@ -95,6 +139,7 @@ export function StudioEditor({
             <form action={saveAction} className={loginStyles.form}>
               <input type="hidden" name="id" value={design.id} />
               <input type="hidden" name="hue" value={hue} />
+              <input type="hidden" name="fields" value={fieldsJson} />
               <label className={loginStyles.label}>
                 Draft name
                 <input
@@ -104,32 +149,11 @@ export function StudioEditor({
                   onChange={(e) => setName(e.target.value)}
                 />
               </label>
-              <label className={loginStyles.label}>
-                Headline
-                <input
-                  className={loginStyles.input}
-                  name="headline"
-                  value={headline}
-                  onChange={(e) => setHeadline(e.target.value)}
-                  required
-                />
-              </label>
-              {showSub && (
-                <label className={loginStyles.label}>
-                  Subtext
-                  <input className={loginStyles.input} name="sub" value={sub} onChange={(e) => setSub(e.target.value)} />
-                </label>
-              )}
-              {showTag && (
-                <label className={loginStyles.label}>
-                  Badge / tag
-                  <input className={loginStyles.input} name="tag" value={tag} onChange={(e) => setTag(e.target.value)} />
-                </label>
-              )}
+
               <label className={loginStyles.label}>
                 Color
                 <div className={styles.swatchRow}>
-                  {PALETTE.map((h) => (
+                  {PALETTE_HUES.map((h) => (
                     <button
                       key={h}
                       type="button"
@@ -141,9 +165,13 @@ export function StudioEditor({
                   ))}
                 </div>
               </label>
+
               {saveState?.error && <div className={loginStyles.error}>{saveState.error}</div>}
               <button className={loginStyles.btn} type="submit" disabled={savePending}>
                 {savePending ? "Saving…" : saveState?.saved ? "Saved ✓" : "Save draft"}
+              </button>
+              <button type="button" className={shell.btnGhost} disabled={downloading} onClick={handleDownload} style={{ width: "100%" }}>
+                {downloading ? "Rendering…" : "Download PNG"}
               </button>
             </form>
           ) : null}
@@ -168,6 +196,8 @@ export function StudioEditor({
             <div>
               <form action={sendActionFn} className={loginStyles.form}>
                 <input type="hidden" name="designId" value={design.id} />
+                <input type="hidden" name="hue" value={hue} />
+                <input type="hidden" name="fields" value={fieldsJson} />
                 <label className={loginStyles.label}>
                   Send to client
                   <select className={loginStyles.input} name="clientId" required>
@@ -182,6 +212,9 @@ export function StudioEditor({
                 {sendState?.error && <div className={loginStyles.error}>{sendState.error}</div>}
                 <button className={loginStyles.btn} type="submit" disabled={sendPending}>
                   {sendPending ? "Sending…" : "Send for approval"}
+                </button>
+                <button type="button" className={shell.btnGhost} disabled={downloading} onClick={handleDownload} style={{ width: "100%" }}>
+                  {downloading ? "Rendering…" : "Download PNG"}
                 </button>
               </form>
 

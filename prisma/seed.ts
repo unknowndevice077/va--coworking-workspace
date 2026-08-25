@@ -1,13 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { designTemplates } from "../src/lib/design-templates";
+import { findTemplate, defaultFieldValues } from "../src/lib/graphic-templates";
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.designApproval.deleteMany();
   await prisma.design.deleteMany();
-  await prisma.designTemplate.deleteMany();
   await prisma.message.deleteMany();
   await prisma.messageThread.deleteMany();
   await prisma.clientFile.deleteMany();
@@ -132,43 +131,36 @@ async function main() {
     ],
   });
 
-  for (const t of designTemplates) {
-    await prisma.designTemplate.create({
-      data: {
-        id: t.id,
-        name: t.name,
-        category: t.category,
-        keywords: t.keywords.join(","),
-        svg: t.iconPath,
-      },
-    });
-  }
-
-  const sentTemplate = designTemplates.find((t) => t.id === "social-bold-announcement")!;
+  const sentTemplate = findTemplate("bold-quote-card")!;
   await prisma.designApproval.create({
     data: {
       clientId: brightleaf.id,
       templateId: sentTemplate.id,
       status: "PENDING",
-      promptText: "Instagram post announcing our fall bakery menu",
-      headline: "Fall menu is here",
-      sub: sentTemplate.sub,
-      tag: sentTemplate.tag,
-      hue: sentTemplate.hue,
+      promptText: "customer quote card",
+      fields: {
+        ...defaultFieldValues(sentTemplate),
+        quote: "“Brightleaf made our fall launch effortless.”",
+        authorName: "Elena Cho",
+        authorTitle: "Owner, Brightleaf Studio",
+      } satisfies Record<string, string> as Prisma.InputJsonValue,
+      hue: sentTemplate.defaultHue,
     },
   });
 
   // A private draft, sitting in the VA's own studio — not sent to anyone,
   // to demonstrate the "My Designs" library on a fresh seed.
-  const draftTemplate = designTemplates.find((t) => t.id === "flyer-open-house")!;
+  const draftTemplate = findTemplate("event-flyer")!;
   await prisma.design.create({
     data: {
       templateId: draftTemplate.id,
       name: "Coastal Realty — open house flyer",
-      headline: "Open House · Saturday",
-      sub: draftTemplate.sub,
-      tag: draftTemplate.tag,
-      hue: draftTemplate.hue,
+      fields: {
+        ...defaultFieldValues(draftTemplate),
+        brand: "Coastal Realty Group",
+        eventTitle: "Waterfront Open House",
+      } satisfies Record<string, string> as Prisma.InputJsonValue,
+      hue: draftTemplate.defaultHue,
       promptText: "open house flyer for coastal realty",
       status: "DRAFT",
     },

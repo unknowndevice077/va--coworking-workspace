@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { designTemplates } from "@/lib/design-templates";
+import { findTemplate } from "@/lib/graphic-templates";
 import { StudioEditor } from "./StudioEditor";
 
 export default async function DesignStudioDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -12,7 +12,7 @@ export default async function DesignStudioDetailPage({ params }: { params: Promi
   });
   if (!design) notFound();
 
-  const template = designTemplates.find((t) => t.id === design.templateId);
+  const template = findTemplate(design.templateId);
   if (!template) notFound();
 
   const clients = await prisma.client.findMany({ orderBy: { name: "asc" } });
@@ -22,13 +22,11 @@ export default async function DesignStudioDetailPage({ params }: { params: Promi
       design={{
         id: design.id,
         name: design.name,
-        headline: design.headline,
-        sub: design.sub,
-        tag: design.tag,
+        fields: design.fields as Record<string, string>,
         hue: design.hue,
         status: design.status,
+        templateId: design.templateId,
       }}
-      template={template}
       clients={clients}
       approvals={design.approvals.map((a) => ({ id: a.id, status: a.status, clientName: a.client.name }))}
     />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { designTemplates } from "@/lib/design-templates";
-import { TemplateThumb } from "@/components/TemplateThumb";
+import { findTemplate } from "@/lib/graphic-templates";
+import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import shell from "@/components/AppShell.module.css";
 import styles from "../design-engine.module.css";
 
@@ -30,13 +30,14 @@ export default async function MyDesignsPage() {
       ) : (
         <div className={`${styles.results} staggerChildren`}>
           {designs.map((d) => {
-            const template = designTemplates.find((t) => t.id === d.templateId);
+            const template = findTemplate(d.templateId);
             if (!template) return null;
-            const preview = { ...template, headline: d.headline, sub: d.sub ?? undefined, tag: d.tag ?? undefined, hue: d.hue };
             return (
               <Link href={`/design-engine/studio/${d.id}`} className={styles.tcard} key={d.id} style={{ display: "block" }}>
                 <div className={styles.thumb}>
-                  <TemplateThumb template={preview} variant="grid" />
+                  <ScaledCanvas width={template.width} height={template.height}>
+                    <template.Component values={d.fields as Record<string, string>} hue={d.hue} editable={false} />
+                  </ScaledCanvas>
                 </div>
                 <div className={styles.tbody}>
                   <div className={styles.tname}>{d.name}</div>

@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { designTemplates } from "@/lib/design-templates";
+import { findTemplate } from "@/lib/graphic-templates";
 import { approveDesignAction, requestChangesAction } from "./actions";
 import { IconFile } from "@/components/icons";
-import { TemplateThumb } from "@/components/TemplateThumb";
+import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import styles from "./portal.module.css";
 
 function initialsOf(name: string) {
@@ -65,14 +65,15 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             <div className={styles.pt}>Designs</div>
             {client.designApprovals.length === 0 && <div style={{ color: "var(--sub)", fontSize: 13 }}>No designs yet.</div>}
             {client.designApprovals.map((approval) => {
-              const template = designTemplates.find((t) => t.id === approval.templateId);
-              const previewTemplate = template
-                ? { ...template, headline: approval.headline, sub: approval.sub ?? undefined, tag: approval.tag ?? undefined, hue: approval.hue }
-                : template;
+              const template = findTemplate(approval.templateId);
               return (
                 <div className={styles.approval} key={approval.id}>
                   <div className={styles.thumb}>
-                    {previewTemplate && <TemplateThumb template={previewTemplate} variant="grid" />}
+                    {template && (
+                      <ScaledCanvas width={template.width} height={template.height}>
+                        <template.Component values={approval.fields as Record<string, string>} hue={approval.hue} editable={false} />
+                      </ScaledCanvas>
+                    )}
                   </div>
                   <div className={styles.appinfo}>
                     <div className={styles.appname}>{template?.name ?? "Design"}</div>

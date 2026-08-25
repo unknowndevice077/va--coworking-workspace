@@ -4,13 +4,14 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { designTemplates } from "@/lib/design-templates";
-import { guessHeadline } from "@/lib/match-template";
+import { findTemplate, guessHeadline, defaultFieldValues } from "@/lib/graphic-templates";
+import type { Prisma } from "@prisma/client";
 
 /**
  * Starts a new design from a template — a private draft in the VA's own
- * studio, not anything a client can see. This is the "Use" action from the
- * template library: it does NOT send anything, it just opens the editor.
+ * studio, not anything a client can see. This is the "Design this" action
+ * from the template library: it does NOT send anything, it just opens the
+ * editor with the template's real content pre-filled.
  */
 export async function createDesignAction(formData: FormData) {
   const user = await getCurrentUser();
@@ -18,17 +19,20 @@ export async function createDesignAction(formData: FormData) {
 
   const templateId = String(formData.get("templateId") ?? "");
   const promptText = String(formData.get("promptText") ?? "");
-  const template = designTemplates.find((t) => t.id === templateId);
+  const template = findTemplate(templateId);
   if (!template) redirect("/design-engine");
+
+  const fields = defaultFieldValues(template);
+  if (promptText.trim()) {
+    fields[template.primaryField] = guessHeadline(promptText);
+  }
 
   const design = await prisma.design.create({
     data: {
       templateId: template.id,
       name: template.name,
-      headline: promptText.trim() ? guessHeadline(promptText) : template.headline,
-      sub: template.sub ?? null,
-      tag: template.tag ?? null,
-      hue: template.hue,
+      fields: fields as Prisma.InputJsonValue,
+      hue: template.defaultHue,
       promptText,
       status: "DRAFT",
     },
@@ -47,21 +51,23 @@ export async function updateDesignAction(
 
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  const headline = String(formData.get("headline") ?? "").trim();
-  const sub = String(formData.get("sub") ?? "").trim();
-  const tag = String(formData.get("tag") ?? "").trim();
   const hue = Number(formData.get("hue") ?? 0);
+  const fieldsRaw = String(formData.get("fields") ?? "{}");
 
   if (!id) return { error: "Design not found." };
-  if (!headline) return { error: "Give it a headline before saving." };
+
+  let fields: Record<string, string>;
+  try {
+    fields = JSON.parse(fieldsRaw);
+  } catch {
+    return { error: "Couldn't read the design's content." };
+  }
 
   await prisma.design.update({
     where: { id },
     data: {
       name: name || "Untitled design",
-      headline,
-      sub: sub || null,
-      tag: tag || null,
+      fields: fields as Prisma.InputJsonValue,
       hue: Number.isFinite(hue) ? hue : 0,
     },
   });
@@ -93,26 +99,39 @@ export async function sendDesignAction(_prevState: { error?: string } | undefine
 
   const designId = String(formData.get("designId") ?? "");
   const clientId = String(formData.get("clientId") ?? "");
+  const hue = Number(formData.get("hue") ?? 0);
+  const fieldsRaw = String(formData.get("fields") ?? "{}");
   if (!designId || !clientId) return { error: "Pick a client first." };
+
+  let fields: Record<string, string>;
+  try {
+    fields = JSON.parse(fieldsRaw);
+  } catch {
+    return { error: "Couldn't read the design's content." };
+  }
 
   const design = await prisma.design.findUnique({ where: { id: designId } });
   if (!design) return { error: "Design not found." };
 
+  // Sending snapshots whatever is currently on the canvas — including
+  // edits made but not yet explicitly saved — and persists that same
+  // content back onto the draft, so nothing typed gets silently lost.
   await prisma.$transaction([
+    prisma.design.update({
+      where: { id: designId },
+      data: { fields: fields as Prisma.InputJsonValue, hue: Number.isFinite(hue) ? hue : design.hue, status: "SENT" },
+    }),
     prisma.designApproval.create({
       data: {
         clientId,
         templateId: design.templateId,
         designId: design.id,
-        headline: design.headline,
-        sub: design.sub,
-        tag: design.tag,
-        hue: design.hue,
+        fields: fields as Prisma.InputJsonValue,
+        hue: Number.isFinite(hue) ? hue : design.hue,
         promptText: design.promptText,
         status: "PENDING",
       },
     }),
-    prisma.design.update({ where: { id: designId }, data: { status: "SENT" } }),
   ]);
 
   revalidatePath(`/clients/${clientId}`);

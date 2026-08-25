@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { matchTemplates } from "@/lib/match-template";
-import { designTemplates, templateCategories, type TemplateCategory } from "@/lib/design-templates";
+import { matchTemplates, templateCategories, defaultFieldValues, type TemplateCategory } from "@/lib/graphic-templates";
 import { IconSparkle, IconArrowRight } from "@/components/icons";
-import { TemplateThumb } from "@/components/TemplateThumb";
+import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import { createDesignAction } from "./actions";
 import shell from "@/components/AppShell.module.css";
 import styles from "./design-engine.module.css";
@@ -31,7 +30,7 @@ export default async function DesignEnginePage({
         <div className={styles.badgeRow}>
           <span className={styles.smartBadge}>
             <IconSparkle />
-            SMART TEMPLATES · {designTemplates.length}+ DESIGNS
+            SMART TEMPLATES · REAL GRAPHICS, NOT COLOR BLOCKS
           </span>
         </div>
         <form method="get" className={styles.promptbox}>
@@ -49,8 +48,8 @@ export default async function DesignEnginePage({
         </form>
         <div className={styles.trynote}>
           Matched instantly from our template library, no waiting. Try:{" "}
-          <Link href="/design-engine?q=real+estate+open+house+flyer">&quot;real estate open house flyer&quot;</Link> ·{" "}
-          <Link href="/design-engine?q=fitness+studio+logo">&quot;fitness studio logo&quot;</Link>
+          <Link href="/design-engine?q=open+house+event+flyer">&quot;open house event flyer&quot;</Link> ·{" "}
+          <Link href="/design-engine?q=logo+for+a+law+firm">&quot;logo for a law firm&quot;</Link>
         </div>
       </div>
 
@@ -74,7 +73,9 @@ export default async function DesignEnginePage({
         {results.map((t) => (
           <div className={styles.tcard} key={t.id}>
             <div className={styles.thumb}>
-              <TemplateThumb template={t} variant="grid" />
+              <ScaledCanvas width={t.width} height={t.height}>
+                <t.Component values={defaultFieldValues(t)} hue={t.defaultHue} editable={false} />
+              </ScaledCanvas>
             </div>
             <div className={styles.tbody}>
               <div className={styles.tname}>{t.name}</div>
