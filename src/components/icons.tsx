@@ -86,14 +86,6 @@ export function IconGlobe({ className }: IconProps) {
   );
 }
 
-export function IconBrandMark({ className }: IconProps) {
-  return (
-    <svg {...base} className={className} strokeWidth={2}>
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2" />
-    </svg>
-  );
-}
-
 export function IconPlus({ className }: IconProps) {
   return (
     <svg {...base} className={className} strokeWidth={2}>

@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction } from "./actions";
-import { IconBrandMark } from "@/components/icons";
+import { Logo } from "@/components/Logo";
 import styles from "./login.module.css";
 
 export default function LoginPage() {
@@ -12,9 +12,7 @@ export default function LoginPage() {
     <div className={styles.wrap}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <div className={styles.mark}>
-            <IconBrandMark />
-          </div>
+          <Logo size={32} />
           <div className={styles.name}>VA Hub</div>
         </div>
         <h1 className={styles.h1}>Sign in</h1>

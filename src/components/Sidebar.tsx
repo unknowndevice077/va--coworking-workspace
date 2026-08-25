@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./AppShell.module.css";
 import { ThemeToggle } from "./ThemeToggle";
+import { Logo } from "./Logo";
 import {
   IconHome,
   IconUsers,
@@ -14,7 +15,6 @@ import {
   IconReceipt,
   IconInbox,
   IconGlobe,
-  IconBrandMark,
   IconMenu,
   IconX,
 } from "./icons";
@@ -61,9 +61,7 @@ export function Sidebar({ userName, userInitials }: { userName: string; userInit
           <IconMenu />
         </button>
         <div className={styles.brand} style={{ padding: 0 }}>
-          <div className={styles.mark}>
-            <IconBrandMark />
-          </div>
+          <Logo size={27} />
           <div className={styles.brandName}>VA Hub</div>
         </div>
       </div>
@@ -72,9 +70,7 @@ export function Sidebar({ userName, userInitials }: { userName: string; userInit
 
       <div className={`${styles.side} ${open ? styles.open : ""}`}>
         <div className={styles.brand}>
-          <div className={styles.mark}>
-            <IconBrandMark />
-          </div>
+          <Logo size={27} />
           <div className={styles.brandName}>VA Hub</div>
           <button
             type="button"
