@@ -2,6 +2,7 @@ import Link from "next/link";
 import { matchTemplates } from "@/lib/match-template";
 import { designTemplates, templateCategories, type TemplateCategory } from "@/lib/design-templates";
 import { IconSparkle, IconArrowRight } from "@/components/icons";
+import { TemplateThumb } from "@/components/TemplateThumb";
 import shell from "@/components/AppShell.module.css";
 import styles from "./design-engine.module.css";
 
@@ -13,7 +14,7 @@ export default async function DesignEnginePage({
   const { q = "", category = "All" } = await searchParams;
   const cat = (templateCategories as readonly string[]).includes(category) ? (category as TemplateCategory) : "All";
 
-  const results = matchTemplates(q, { category: cat === "All" ? "All" : cat, limit: 8 });
+  const results = matchTemplates(q, { category: cat === "All" ? "All" : cat, limit: 12 });
 
   return (
     <div>
@@ -66,10 +67,8 @@ export default async function DesignEnginePage({
       <div className={`${styles.results} staggerChildren`}>
         {results.map((t) => (
           <div className={styles.tcard} key={t.id}>
-            <div className={styles.thumb} style={{ background: `oklch(0.92 0.045 ${t.hue})` }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke={`oklch(0.5 0.14 ${t.hue})`} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
-                <path d={t.iconPath} />
-              </svg>
+            <div className={styles.thumb}>
+              <TemplateThumb template={t} variant="grid" />
             </div>
             <div className={styles.tbody}>
               <div className={styles.tname}>{t.name}</div>

@@ -50,6 +50,6 @@ export function matchTemplates(
 export function guessHeadline(prompt: string): string {
   const cleaned = prompt.trim();
   if (!cleaned) return "Your headline here";
-  const words = cleaned.split(/\s+/).slice(0, 6).join(" ");
+  const words = cleaned.split(/\s+/).slice(0, 4).join(" ");
   return words.charAt(0).toUpperCase() + words.slice(1);
 }

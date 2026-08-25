@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { designTemplates } from "@/lib/design-templates";
 import { guessHeadline } from "@/lib/match-template";
+import { TemplateThumb } from "@/components/TemplateThumb";
 import { ApprovalForm } from "./ApprovalForm";
 import shell from "@/components/AppShell.module.css";
 import styles from "../../design-engine.module.css";
@@ -19,7 +20,11 @@ export default async function UseTemplatePage({
   if (!template) notFound();
 
   const clients = await prisma.client.findMany({ orderBy: { name: "asc" } });
-  const headline = guessHeadline(q);
+  // When the VA typed a prompt, reflect it in the preview headline so the
+  // page reads as "here's what your request produced," not just the
+  // template's generic sample — everything else about the template stays
+  // the same real, pre-built layout.
+  const previewTemplate = q.trim() ? { ...template, headline: guessHeadline(q) } : template;
 
   return (
     <div>
@@ -31,31 +36,8 @@ export default async function UseTemplatePage({
       </div>
 
       <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <div
-          className={styles.thumb}
-          style={{
-            width: 260,
-            height: 200,
-            borderRadius: 8,
-            background: `oklch(0.92 0.045 ${template.hue})`,
-            flexDirection: "column",
-            gap: 10,
-          }}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={`oklch(0.5 0.14 ${template.hue})`}
-            strokeWidth={1.4}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ width: 48, height: 48 }}
-          >
-            <path d={template.iconPath} />
-          </svg>
-          <div style={{ fontSize: 12, fontWeight: 700, color: `oklch(0.4 0.12 ${template.hue})`, textAlign: "center", padding: "0 16px" }}>
-            {headline}
-          </div>
+        <div className={styles.thumb} style={{ width: 260, height: 200, borderRadius: 8 }}>
+          <TemplateThumb template={previewTemplate} variant="hero" />
         </div>
 
         <div style={{ minWidth: 280, maxWidth: 420, flex: 1 }}>

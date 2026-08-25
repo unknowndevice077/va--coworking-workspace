@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { designTemplates } from "@/lib/design-templates";
+import { guessHeadline } from "@/lib/match-template";
 import { approveDesignAction, requestChangesAction } from "./actions";
 import { IconFile } from "@/components/icons";
+import { TemplateThumb } from "@/components/TemplateThumb";
 import styles from "./portal.module.css";
 
 function initialsOf(name: string) {
@@ -65,14 +67,13 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             {client.designApprovals.length === 0 && <div style={{ color: "var(--sub)", fontSize: 13 }}>No designs yet.</div>}
             {client.designApprovals.map((approval) => {
               const template = designTemplates.find((t) => t.id === approval.templateId);
+              const previewTemplate = template && approval.promptText.trim()
+                ? { ...template, headline: guessHeadline(approval.promptText) }
+                : template;
               return (
                 <div className={styles.approval} key={approval.id}>
-                  <div className={styles.thumb} style={{ background: `oklch(0.92 0.045 ${template?.hue ?? 255})` }}>
-                    {template && (
-                      <svg viewBox="0 0 24 24" fill="none" stroke={`oklch(0.5 0.14 ${template.hue})`} strokeLinecap="round" strokeLinejoin="round">
-                        <path d={template.iconPath} />
-                      </svg>
-                    )}
+                  <div className={styles.thumb}>
+                    {previewTemplate && <TemplateThumb template={previewTemplate} variant="grid" />}
                   </div>
                   <div className={styles.appinfo}>
                     <div className={styles.appname}>{template?.name ?? "Design"}</div>

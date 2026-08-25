@@ -133,21 +133,14 @@
   border-color: var(--accent);
 }
 .thumb {
-  height: 104px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent-soft);
+  height: 132px;
+  overflow: hidden;
 }
-.thumb svg {
-  width: 36px;
-  height: 36px;
-  color: var(--accent);
-  stroke-width: 1.5;
-  transition: transform 0.2s ease;
+.thumb > div {
+  transition: transform 0.25s ease;
 }
-.tcard:hover .thumb svg {
-  transform: scale(1.12);
+.tcard:hover .thumb > div {
+  transform: scale(1.04);
 }
 .tbody {
   padding: 12px 14px;
