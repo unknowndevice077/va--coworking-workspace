@@ -160,7 +160,12 @@ export function ElementLayer({
           style={{
             width: "100%",
             height: "100%",
-            fontFamily: el.fontFamily === "display" ? "'Space Grotesk', system-ui, sans-serif" : "'Inter', system-ui, sans-serif",
+            fontFamily:
+              el.fontFamily === "display"
+                ? "'Space Grotesk', system-ui, sans-serif"
+                : el.fontFamily === "serif"
+                  ? "'Source Serif 4', Georgia, serif"
+                  : "'Inter', system-ui, sans-serif",
             fontSize: el.fontSize,
             fontWeight: el.fontWeight,
             color: el.color,

@@ -129,14 +129,14 @@ export function PropertiesPanel({
           <div className={styles.propGroup}>
             <div className={styles.propLabel}>Font</div>
             <div className={styles.segRow}>
-              {(["display", "body"] as const).map((f) => (
+              {(["display", "body", "serif"] as const).map((f) => (
                 <button
                   key={f}
                   type="button"
                   className={`${styles.segBtn} ${el.fontFamily === f ? styles.segOn : ""}`}
                   onClick={() => onChange({ fontFamily: f })}
                 >
-                  {f === "display" ? "Headline" : "Body"}
+                  {f === "display" ? "Headline" : f === "body" ? "Body" : "Serif"}
                 </button>
               ))}
             </div>

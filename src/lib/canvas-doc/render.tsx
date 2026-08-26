@@ -4,6 +4,7 @@ import { GIcon } from "./icons";
 const fontStacks = {
   display: "'Space Grotesk', 'Public Sans', system-ui, sans-serif",
   body: "'Inter', 'Public Sans', system-ui, sans-serif",
+  serif: "'Source Serif 4', Georgia, serif",
 };
 
 /** The visual content of one element, sized to fill its (already-positioned) container. */
@@ -71,7 +72,7 @@ export function ElementContent({ el }: { el: DesignElement }) {
             borderRadius: el.background ? Math.min(el.w, el.h) * 0.22 : 0,
           }}
         >
-          <GIcon name={el.icon} size={Math.min(el.w, el.h) * 0.62} stroke={el.color} />
+          <GIcon name={el.icon} size={Math.min(el.w, el.h) * 0.62} stroke={el.color} filled={el.filled} />
         </div>
       );
     case "image":

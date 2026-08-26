@@ -39,13 +39,23 @@ export async function createDesignAction(formData: FormData) {
 
   // Reflect the VA's prompt in whatever reads as the design's main
   // headline (its largest text element, on the first page) — everything
-  // else about the template stays the same real, pre-built layout.
+  // else about the template stays the same real, pre-built layout. Only
+  // a real multi-word phrase qualifies: several templates have a bigger
+  // *value* than their headline (a $350,000 price, a 32px stat number, a
+  // giant decorative quote mark) and none of those read as a headline.
   if (promptText.trim()) {
     const headline = guessHeadline(promptText);
     const elements = doc.pages[0].elements;
+    const looksLikeHeadline = (text: string) => text.trim().length >= 4 && /\s/.test(text.trim());
     let target: (typeof elements)[number] | undefined;
     for (const el of elements) {
-      if (el.type === "text" && (!target || (target.type === "text" && el.fontSize > target.fontSize))) target = el;
+      if (
+        el.type === "text" &&
+        looksLikeHeadline(el.text) &&
+        (!target || (target.type === "text" && el.fontSize > target.fontSize))
+      ) {
+        target = el;
+      }
     }
     if (target && target.type === "text") target.text = headline;
   }

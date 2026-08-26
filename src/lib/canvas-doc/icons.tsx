@@ -19,6 +19,14 @@ export const gIcons = {
   briefcase: "M4 8h16v11H4Z M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
   home: "M3 10.5 12 4l9 6.5 M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5",
   users: "M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3 M17 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+  bed: "M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4 M3 18v2M21 18v2 M5 12V7a2 2 0 0 1 2-2h3v5",
+  bath: "M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3Z M7 12V6a2 2 0 0 1 3-1.9 M4 19v2 M20 19v2",
+  sqft: "M3 9h18v6H3Z M7 9v3M11 9v3M15 9v3",
+  lot: "M4 4h16v16H4Z",
+  trendUp: "M12 19V5M5 12l7-7 7 7",
+  trendDown: "M12 5v14M19 12l-7 7-7-7",
+  xmark: "M18 6 6 18M6 6l12 12",
+  camera: "M4 8h3l2-2h6l2 2h3v11H4V8Z M8.5 14a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0",
 } as const;
 
 export type GIconName = keyof typeof gIcons;
@@ -28,18 +36,21 @@ export function GIcon({
   size = 20,
   stroke = "currentColor",
   strokeWidth = 1.8,
+  filled = false,
 }: {
   name: GIconName;
   size?: number;
   stroke?: string;
   strokeWidth?: number;
+  /** Solid-fill the icon in its own stroke color — for things like a star rating, not just outlines. */
+  filled?: boolean;
 }) {
   return (
     <svg
       viewBox="0 0 24 24"
       width={size}
       height={size}
-      fill="none"
+      fill={filled ? stroke : "none"}
       stroke={stroke}
       strokeWidth={strokeWidth}
       strokeLinecap="round"

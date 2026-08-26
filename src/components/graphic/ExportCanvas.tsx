@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 
 const FONTS_HREF =
-  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap";
 
 function prepareDoc(d: Document) {
   if (!d.getElementById("export-reset")) {

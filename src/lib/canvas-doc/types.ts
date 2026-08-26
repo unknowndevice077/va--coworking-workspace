@@ -15,7 +15,7 @@ interface BaseEl {
 export interface TextEl extends BaseEl {
   type: "text";
   text: string;
-  fontFamily: "display" | "body";
+  fontFamily: "display" | "body" | "serif";
   fontSize: number;
   fontWeight: 400 | 500 | 600 | 700;
   color: string;
@@ -38,6 +38,8 @@ export interface IconEl extends BaseEl {
   icon: GIconName;
   color: string;
   background?: string;
+  /** Solid-fill the icon (a star rating, a checkmark badge) instead of just outlining it. */
+  filled?: boolean;
 }
 
 export interface ImageEl extends BaseEl {
