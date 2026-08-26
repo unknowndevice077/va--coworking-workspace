@@ -6,7 +6,10 @@ import type { CanvasDoc } from "../src/lib/canvas-doc/types";
 function withText(doc: CanvasDoc, matchText: string, newText: string): CanvasDoc {
   return {
     ...doc,
-    elements: doc.elements.map((el) => (el.type === "text" && el.text === matchText ? { ...el, text: newText } : el)),
+    pages: doc.pages.map((page) => ({
+      ...page,
+      elements: page.elements.map((el) => (el.type === "text" && el.text === matchText ? { ...el, text: newText } : el)),
+    })),
   };
 }
 

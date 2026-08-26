@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DocSurface } from "@/lib/canvas-doc/render";
-import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
+import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import shell from "@/components/AppShell.module.css";
 import styles from "../design-engine.module.css";
@@ -41,8 +41,8 @@ export default async function FinishedDesignsPage() {
       ) : (
         <div className={`${styles.results} staggerChildren`}>
           {approvals.map((a) => {
-            if (!isValidDoc(a.doc)) return null;
-            const doc = a.doc as CanvasDoc;
+            const doc = normalizeDoc(a.doc);
+            if (!doc) return null;
             return (
               <div className={styles.tcard} key={a.id}>
                 <div className={styles.thumb}>

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
+import { normalizeDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
 import { blankDoc } from "@/lib/canvas-doc/presets";
 import { CanvasEditor } from "@/components/canvas-editor/CanvasEditor";
 
@@ -15,7 +15,7 @@ export default async function DesignStudioDetailPage({ params }: { params: Promi
 
   // A design saved before this shape existed, or with corrupted content —
   // open it as a blank canvas rather than crashing the page.
-  const doc: CanvasDoc = isValidDoc(design.doc) ? design.doc : blankDoc("Social Post");
+  const doc: CanvasDoc = normalizeDoc(design.doc) ?? blankDoc("Social Post");
 
   return (
     <CanvasEditor

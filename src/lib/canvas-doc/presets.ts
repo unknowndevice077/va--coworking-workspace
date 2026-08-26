@@ -1,15 +1,28 @@
-import type { CanvasDoc, DesignElement, DistributiveOmit, TemplateCategory, TemplatePreset } from "./types";
+import type { CanvasDoc, CanvasPage, DesignElement, DistributiveOmit, TemplateCategory, TemplatePreset } from "./types";
 
 export type { TemplateCategory } from "./types";
 
 type RawEl = DistributiveOmit<DesignElement, "id" | "zIndex" | "rotation"> & { rotation?: number };
 
+function finalizeElements(prefix: string, raw: RawEl[]): DesignElement[] {
+  return raw.map((r, i) => ({ ...r, id: `${prefix}_${i}`, zIndex: i, rotation: r.rotation ?? 0 }) as DesignElement);
+}
+
+/** A single-page doc — the common case (a flyer, a logo, a business card, one social post). */
 function finalize(width: number, height: number, background: string, raw: RawEl[]): CanvasDoc {
   return {
     width,
     height,
-    background,
-    elements: raw.map((r, i) => ({ ...r, id: `preset_${i}`, zIndex: i, rotation: r.rotation ?? 0 }) as DesignElement),
+    pages: [{ id: "page-1", background, elements: finalizeElements("preset", raw) }],
+  };
+}
+
+/** A multi-page doc — a real deck, one page per slide. */
+function finalizeDeck(width: number, height: number, slides: { background: string; raw: RawEl[] }[]): CanvasDoc {
+  return {
+    width,
+    height,
+    pages: slides.map((s, i) => ({ id: `page-${i + 1}`, background: s.background, elements: finalizeElements(`preset_${i}`, s.raw) })),
   };
 }
 
@@ -46,6 +59,26 @@ const localTipPubmat: TemplatePreset = {
   ]),
 };
 
+// ---------- Product Announcement (Social Post, 1080x1080) ----------
+const p6 = { deep: "#3a2a12", warm: "#c9772e", tint: "#fbeedd" };
+const productAnnouncement: TemplatePreset = {
+  id: "product-announcement",
+  name: "Product Announcement",
+  category: "Social Post",
+  keywords: ["product", "launch", "announcement", "new", "sale", "drop", "instagram", "square"],
+  doc: finalize(1080, 1080, p6.tint, [
+    { type: "shape", shape: "rect", x: 0, y: 0, w: 1080, h: 1080, fill: p6.tint, radius: 0, opacity: 1 },
+    { type: "shape", shape: "ellipse", x: -180, y: -180, w: 520, h: 520, fill: p6.warm, radius: 0, opacity: 0.18 },
+    { type: "text", x: 90, y: 110, w: 500, h: 30, text: "NOW AVAILABLE", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p6.warm, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 90, y: 150, w: 900, h: 260, text: "Meet the new Studio Collection", fontFamily: "display", fontSize: 64, fontWeight: 700, color: p6.deep, align: "left", lineHeight: 1.08 },
+    { type: "text", x: 90, y: 420, w: 720, h: 70, text: "Hand-finished pieces, made to order, shipping worldwide starting this week.", fontFamily: "body", fontSize: 19, fontWeight: 400, color: "#6b5a44", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 90, y: 560, w: 900, h: 380, fill: "#ffffff", radius: 18, opacity: 1 },
+    { type: "icon", x: 500, y: 690, w: 80, h: 80, icon: "sparkle", color: p6.warm },
+    { type: "shape", shape: "rect", x: 90, y: 980, w: 300, h: 60, fill: p6.deep, radius: 30, opacity: 1 },
+    { type: "text", x: 90, y: 998, w: 300, h: 26, text: "Shop the drop →", fontFamily: "body", fontSize: 15, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
 // ---------- Event Flyer (Flyer, 1080x1350) ----------
 const p2 = { deep: "#5c1f2e", mid: "#8a3a44", tint: "#fbeef0", tint2: "#f6dde1" };
 const eventFlyer: TemplatePreset = {
@@ -73,6 +106,30 @@ const eventFlyer: TemplatePreset = {
   ]),
 };
 
+// ---------- Workshop Poster (Flyer, 1080x1350) ----------
+const p7 = { deep: "#0d3b3f", mid: "#1f7a80", cream: "#f3ede0" };
+const workshopPoster: TemplatePreset = {
+  id: "workshop-poster",
+  name: "Workshop Poster",
+  category: "Flyer",
+  keywords: ["workshop", "class", "poster", "seminar", "training", "course", "sign up"],
+  doc: finalize(1080, 1350, p7.deep, [
+    { type: "text", x: 80, y: 90, w: 700, h: 30, text: "A HANDS-ON WORKSHOP", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p7.mid, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 80, y: 130, w: 920, h: 260, text: "Intro to Watercolor", fontFamily: "display", fontSize: 66, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.08 },
+    { type: "shape", shape: "line", x: 80, y: 350, w: 90, h: 4, fill: p7.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 80, y: 380, w: 760, h: 70, text: "No experience needed — all materials provided. Just bring your curiosity.", fontFamily: "body", fontSize: 19, fontWeight: 400, color: "rgba(255,255,255,0.8)", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 80, y: 500, w: 920, h: 500, fill: p7.cream, radius: 20, opacity: 1 },
+    { type: "icon", x: 500, y: 660, w: 80, h: 80, icon: "sparkle", color: p7.deep },
+    { type: "shape", shape: "line", x: 80, y: 1040, w: 920, h: 1, fill: "rgba(255,255,255,0.2)", radius: 0, opacity: 1 },
+    { type: "icon", x: 80, y: 1070, w: 34, h: 34, icon: "calendar", color: p7.mid },
+    { type: "text", x: 128, y: 1076, w: 400, h: 26, text: "Saturday, Sept 20 · 10 AM", fontFamily: "body", fontSize: 16, fontWeight: 500, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "icon", x: 80, y: 1116, w: 34, h: 34, icon: "pin", color: p7.mid },
+    { type: "text", x: 128, y: 1122, w: 400, h: 26, text: "The Studio, 88 River St", fontFamily: "body", fontSize: 16, fontWeight: 500, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 0, y: 1250, w: 1080, h: 100, fill: p7.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 1280, w: 1080, h: 40, text: "Sign up at thestudio.com/watercolor", fontFamily: "display", fontSize: 20, fontWeight: 600, color: "#ffffff", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
 // ---------- Icon Lockup (Logo, 1080x1080) ----------
 const p3 = { deep: "#163a4d", mid: "#2f6b82" };
 const iconLockup: TemplatePreset = {
@@ -89,6 +146,23 @@ const iconLockup: TemplatePreset = {
     { type: "text", x: 90, y: 878, w: 300, h: 30, text: "Hexagon Co.", fontFamily: "display", fontSize: 17, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
     { type: "icon", x: 580, y: 875, w: 32, h: 32, icon: "sparkle", color: p3.deep },
     { type: "text", x: 630, y: 878, w: 300, h: 30, text: "Hexagon Co.", fontFamily: "display", fontSize: 17, fontWeight: 700, color: p3.deep, align: "left", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Wordmark Badge (Logo, 1080x1080) ----------
+const p8 = { deep: "#3f2a1a", gold: "#b8863c" };
+const wordmarkBadge: TemplatePreset = {
+  id: "wordmark-badge",
+  name: "Wordmark Badge",
+  category: "Logo",
+  keywords: ["logo", "badge", "wordmark", "circle", "seal", "artisan", "bakery", "coffee"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    { type: "shape", shape: "ellipse", x: 190, y: 190, w: 700, h: 700, fill: "#ffffff", radius: 0, opacity: 1, stroke: p8.deep, strokeWidth: 3 },
+    { type: "shape", shape: "ellipse", x: 230, y: 230, w: 620, h: 620, fill: "#ffffff", radius: 0, opacity: 1, stroke: p8.gold, strokeWidth: 1.5 },
+    { type: "text", x: 290, y: 430, w: 500, h: 90, text: "Maren & Co.", fontFamily: "display", fontSize: 46, fontWeight: 700, color: p8.deep, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 440, y: 530, w: 200, h: 2, fill: p8.gold, radius: 0, opacity: 1 },
+    { type: "text", x: 290, y: 550, w: 500, h: 26, text: "ARTISAN GOODS · EST. 2019", fontFamily: "body", fontSize: 12.5, fontWeight: 600, color: p8.gold, align: "center", lineHeight: 1 },
+    { type: "icon", x: 500, y: 300, w: 80, h: 80, icon: "leaf", color: p8.gold },
   ]),
 };
 
@@ -114,26 +188,101 @@ const bizCardModern: TemplatePreset = {
   ]),
 };
 
-// ---------- Title Slide (Presentation, 1920x1080) ----------
-const p5 = { bg: "#0f2a44", mid: "#3f6d99" };
-const titleSlide: TemplatePreset = {
-  id: "title-slide",
-  name: "Title Slide",
-  category: "Presentation",
-  keywords: ["presentation", "slide", "deck", "title", "pitch", "keynote"],
-  doc: finalize(1920, 1080, p5.bg, [
-    { type: "shape", shape: "ellipse", x: 1350, y: 240, w: 620, h: 620, fill: p5.mid, radius: 0, opacity: 0.18 },
-    { type: "shape", shape: "ellipse", x: 1500, y: 390, w: 320, h: 320, fill: p5.mid, radius: 0, opacity: 0.3 },
-    { type: "text", x: 140, y: 280, w: 800, h: 30, text: "Q4 STRATEGY REVIEW", fontFamily: "body", fontSize: 15, fontWeight: 700, color: "#bcd3e8", align: "left", lineHeight: 1.2 },
-    { type: "text", x: 140, y: 320, w: 1050, h: 170, text: "Where we're taking the brand next", fontFamily: "display", fontSize: 64, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.1 },
-    { type: "text", x: 140, y: 500, w: 780, h: 90, text: "A look at what worked, what didn't, and the plan for next quarter.", fontFamily: "body", fontSize: 22, fontWeight: 400, color: "rgba(255,255,255,0.78)", align: "left", lineHeight: 1.5 },
-    { type: "shape", shape: "line", x: 140, y: 610, w: 44, h: 3, fill: p5.mid, radius: 0, opacity: 1 },
-    { type: "text", x: 200, y: 600, w: 300, h: 30, text: "Jamie Rios", fontFamily: "body", fontSize: 16, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
-    { type: "text", x: 420, y: 600, w: 300, h: 30, text: "September 2026", fontFamily: "body", fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,0.7)", align: "left", lineHeight: 1.2 },
+// ---------- Minimal Business Card (Business Card, 1050x600) ----------
+const p9 = { ink: "#26221c", sub: "#8a8172", line: "#e4ddcd" };
+const minimalCard: TemplatePreset = {
+  id: "minimal-card",
+  name: "Minimal Card",
+  category: "Business Card",
+  keywords: ["business card", "minimal", "clean", "light", "centered", "freelance"],
+  doc: finalize(1050, 600, "#fbfaf6", [
+    { type: "shape", shape: "rect", x: 40, y: 40, w: 970, h: 520, fill: "#fbfaf6", radius: 0, opacity: 1, stroke: p9.line, strokeWidth: 1.5 },
+    { type: "text", x: 0, y: 210, w: 1050, h: 60, text: "SAGE & CO.", fontFamily: "display", fontSize: 30, fontWeight: 700, color: p9.ink, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 475, y: 285, w: 100, h: 1.5, fill: p9.sub, radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 305, w: 1050, h: 26, text: "Interior Design Studio", fontFamily: "body", fontSize: 14, fontWeight: 500, color: p9.sub, align: "center", lineHeight: 1 },
+    { type: "text", x: 0, y: 420, w: 1050, h: 24, text: "hello@sageandco.com   ·   (415) 555-0192   ·   sageandco.com", fontFamily: "body", fontSize: 13, fontWeight: 400, color: p9.ink, align: "center", lineHeight: 1.2 },
   ]),
 };
 
-export const templatePresets: TemplatePreset[] = [localTipPubmat, eventFlyer, iconLockup, bizCardModern, titleSlide];
+// ---------- Starter Pitch Deck (Presentation, 1920x1080, 3 pages) ----------
+const p5 = { bg: "#0f2a44", mid: "#3f6d99" };
+const pitchDeck: TemplatePreset = {
+  id: "pitch-deck",
+  name: "Starter Pitch Deck",
+  category: "Presentation",
+  keywords: ["presentation", "slide", "slides", "deck", "pitch deck", "title", "pitch", "keynote", "ppt", "powerpoint"],
+  doc: finalizeDeck(1920, 1080, [
+    {
+      background: p5.bg,
+      raw: [
+        { type: "shape", shape: "ellipse", x: 1350, y: 240, w: 620, h: 620, fill: p5.mid, radius: 0, opacity: 0.18 },
+        { type: "shape", shape: "ellipse", x: 1500, y: 390, w: 320, h: 320, fill: p5.mid, radius: 0, opacity: 0.3 },
+        { type: "text", x: 140, y: 280, w: 800, h: 30, text: "Q4 STRATEGY REVIEW", fontFamily: "body", fontSize: 15, fontWeight: 700, color: "#bcd3e8", align: "left", lineHeight: 1.2 },
+        { type: "text", x: 140, y: 320, w: 1050, h: 170, text: "Where we're taking the brand next", fontFamily: "display", fontSize: 64, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.1 },
+        { type: "text", x: 140, y: 500, w: 780, h: 90, text: "A look at what worked, what didn't, and the plan for next quarter.", fontFamily: "body", fontSize: 22, fontWeight: 400, color: "rgba(255,255,255,0.78)", align: "left", lineHeight: 1.5 },
+        { type: "shape", shape: "line", x: 140, y: 610, w: 44, h: 3, fill: p5.mid, radius: 0, opacity: 1 },
+        { type: "text", x: 200, y: 600, w: 300, h: 30, text: "Jamie Rios", fontFamily: "body", fontSize: 16, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+        { type: "text", x: 420, y: 600, w: 300, h: 30, text: "September 2026", fontFamily: "body", fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,0.7)", align: "left", lineHeight: 1.2 },
+      ],
+    },
+    {
+      background: "#ffffff",
+      raw: [
+        { type: "text", x: 140, y: 100, w: 800, h: 26, text: "AGENDA", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p5.mid, align: "left", lineHeight: 1.2 },
+        { type: "text", x: 140, y: 135, w: 1000, h: 80, text: "What we'll cover", fontFamily: "display", fontSize: 44, fontWeight: 700, color: p5.bg, align: "left", lineHeight: 1.1 },
+        { type: "shape", shape: "line", x: 140, y: 300, w: 1640, h: 1.5, fill: "#e3e6eb", radius: 0, opacity: 1 },
+        { type: "text", x: 140, y: 335, w: 60, h: 40, text: "01", fontFamily: "display", fontSize: 26, fontWeight: 700, color: p5.mid, align: "left", lineHeight: 1 },
+        { type: "text", x: 240, y: 338, w: 900, h: 36, text: "Where we started the quarter", fontFamily: "display", fontSize: 24, fontWeight: 600, color: p5.bg, align: "left", lineHeight: 1.2 },
+        { type: "shape", shape: "line", x: 140, y: 420, w: 1640, h: 1.5, fill: "#e3e6eb", radius: 0, opacity: 1 },
+        { type: "text", x: 140, y: 455, w: 60, h: 40, text: "02", fontFamily: "display", fontSize: 26, fontWeight: 700, color: p5.mid, align: "left", lineHeight: 1 },
+        { type: "text", x: 240, y: 458, w: 900, h: 36, text: "What we shipped and learned", fontFamily: "display", fontSize: 24, fontWeight: 600, color: p5.bg, align: "left", lineHeight: 1.2 },
+        { type: "shape", shape: "line", x: 140, y: 540, w: 1640, h: 1.5, fill: "#e3e6eb", radius: 0, opacity: 1 },
+        { type: "text", x: 140, y: 575, w: 60, h: 40, text: "03", fontFamily: "display", fontSize: 26, fontWeight: 700, color: p5.mid, align: "left", lineHeight: 1 },
+        { type: "text", x: 240, y: 578, w: 900, h: 36, text: "The plan for next quarter", fontFamily: "display", fontSize: 24, fontWeight: 600, color: p5.bg, align: "left", lineHeight: 1.2 },
+        { type: "shape", shape: "line", x: 140, y: 660, w: 1640, h: 1.5, fill: "#e3e6eb", radius: 0, opacity: 1 },
+      ],
+    },
+    {
+      background: p5.bg,
+      raw: [
+        { type: "shape", shape: "ellipse", x: -160, y: 600, w: 560, h: 560, fill: p5.mid, radius: 0, opacity: 0.18 },
+        { type: "text", x: 140, y: 420, w: 1200, h: 130, text: "Thank you", fontFamily: "display", fontSize: 72, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+        { type: "text", x: 140, y: 560, w: 900, h: 40, text: "Questions? Let's talk.", fontFamily: "body", fontSize: 20, fontWeight: 400, color: "rgba(255,255,255,0.78)", align: "left", lineHeight: 1.4 },
+        { type: "shape", shape: "line", x: 140, y: 640, w: 44, h: 3, fill: p5.mid, radius: 0, opacity: 1 },
+        { type: "text", x: 200, y: 628, w: 400, h: 28, text: "jamie@brightleafstudio.com", fontFamily: "body", fontSize: 15, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1.2 },
+      ],
+    },
+  ]),
+};
+
+// ---------- Stat Highlight Slide (Presentation, 1920x1080) ----------
+const p10 = { bg: "#231a12", warm: "#e0a458" };
+const statHighlightSlide: TemplatePreset = {
+  id: "stat-highlight-slide",
+  name: "Stat Highlight Slide",
+  category: "Presentation",
+  keywords: ["slide", "stat", "number", "metric", "highlight", "results", "growth"],
+  doc: finalize(1920, 1080, p10.bg, [
+    { type: "text", x: 140, y: 140, w: 900, h: 30, text: "THIS QUARTER", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p10.warm, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 130, y: 260, w: 900, h: 340, text: "3.4x", fontFamily: "display", fontSize: 240, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "text", x: 140, y: 640, w: 800, h: 50, text: "growth in monthly active clients", fontFamily: "display", fontSize: 30, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1.3 },
+    { type: "text", x: 140, y: 710, w: 760, h: 60, text: "Compared to the same quarter last year, across every region.", fontFamily: "body", fontSize: 17, fontWeight: 400, color: "rgba(255,255,255,0.65)", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "ellipse", x: 1420, y: 200, w: 420, h: 420, fill: p10.warm, radius: 0, opacity: 0.14 },
+  ]),
+};
+
+export const templatePresets: TemplatePreset[] = [
+  localTipPubmat,
+  productAnnouncement,
+  eventFlyer,
+  workshopPoster,
+  iconLockup,
+  wordmarkBadge,
+  bizCardModern,
+  minimalCard,
+  pitchDeck,
+  statHighlightSlide,
+];
 
 export const templateCategories: TemplateCategory[] = ["Logo", "Social Post", "Flyer", "Business Card", "Presentation"];
 
@@ -149,10 +298,15 @@ const BLANK_SIZE: Record<TemplateCategory, { w: number; h: number; bg: string }>
   Presentation: { w: 1920, h: 1080, bg: "#ffffff" },
 };
 
-/** A truly blank canvas at the right size for a category — start from nothing. */
+/** A truly blank, single-page canvas at the right size for a category — start from nothing. */
 export function blankDoc(category: TemplateCategory): CanvasDoc {
   const { w, h, bg } = BLANK_SIZE[category];
-  return { width: w, height: h, background: bg, elements: [] };
+  return { width: w, height: h, pages: [{ id: "page-1", background: bg, elements: [] }] };
+}
+
+/** A blank page sized to match an existing doc — used when adding a new page/slide in the editor. */
+export function blankPage(id: string, background = "#ffffff"): CanvasPage {
+  return { id, background, elements: [] };
 }
 
 export function matchPresets(prompt: string, opts: { category?: TemplateCategory | "All"; limit?: number } = {}): TemplatePreset[] {

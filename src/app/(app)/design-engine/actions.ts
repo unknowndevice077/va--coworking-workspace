@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { findPreset, blankDoc, guessHeadline, templateCategories } from "@/lib/canvas-doc/presets";
-import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
+import { normalizeDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
 import type { Prisma } from "@prisma/client";
 
 /**
@@ -38,12 +38,13 @@ export async function createDesignAction(formData: FormData) {
   }
 
   // Reflect the VA's prompt in whatever reads as the design's main
-  // headline (its largest text element) — everything else about the
-  // template stays the same real, pre-built layout.
+  // headline (its largest text element, on the first page) — everything
+  // else about the template stays the same real, pre-built layout.
   if (promptText.trim()) {
     const headline = guessHeadline(promptText);
-    let target: (typeof doc.elements)[number] | undefined;
-    for (const el of doc.elements) {
+    const elements = doc.pages[0].elements;
+    let target: (typeof elements)[number] | undefined;
+    for (const el of elements) {
       if (el.type === "text" && (!target || (target.type === "text" && el.fontSize > target.fontSize))) target = el;
     }
     if (target && target.type === "text") target.text = headline;
@@ -76,13 +77,14 @@ export async function updateDesignAction(
 
   if (!id) return { error: "Design not found." };
 
-  let doc: CanvasDoc;
+  let parsed: unknown;
   try {
-    doc = JSON.parse(docRaw);
+    parsed = JSON.parse(docRaw);
   } catch {
     return { error: "Couldn't read the design's content." };
   }
-  if (!isValidDoc(doc)) return { error: "Couldn't read the design's content." };
+  const doc = normalizeDoc(parsed);
+  if (!doc) return { error: "Couldn't read the design's content." };
 
   await prisma.design.update({
     where: { id },
@@ -122,8 +124,8 @@ export async function sendDesignAction(formData: FormData) {
   if (!designId || !clientId) redirect("/design-engine/studio");
 
   const design = await prisma.design.findUnique({ where: { id: designId } });
-  if (!design || !isValidDoc(design.doc)) redirect("/design-engine/studio");
-  const doc = design.doc as unknown as CanvasDoc;
+  const doc = design ? normalizeDoc(design.doc) : null;
+  if (!design || !doc) redirect("/design-engine/studio");
 
   await prisma.$transaction([
     prisma.design.update({

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DocSurface } from "@/lib/canvas-doc/render";
-import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
+import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import { sendDesignAction } from "../actions";
 import shell from "@/components/AppShell.module.css";
@@ -36,8 +36,9 @@ export default async function MyDesignsPage() {
       ) : (
         <div className={`${styles.results} staggerChildren`}>
           {designs.map((d) => {
-            if (!isValidDoc(d.doc)) return null;
-            const doc = d.doc as CanvasDoc;
+            const doc = normalizeDoc(d.doc);
+            if (!doc) return null;
+            const elementCount = doc.pages.reduce((n, p) => n + p.elements.length, 0);
             return (
               <div className={styles.tcard} key={d.id}>
                 <Link href={`/design-engine/studio/${d.id}`} style={{ display: "block" }}>
@@ -52,7 +53,10 @@ export default async function MyDesignsPage() {
                     {d.name}
                   </Link>
                   <div className={styles.tmeta}>
-                    <span className={styles.tcat}>{doc.elements.length} element{doc.elements.length === 1 ? "" : "s"}</span>
+                    <span className={styles.tcat}>
+                      {doc.pages.length > 1 ? `${doc.pages.length} pages · ` : ""}
+                      {elementCount} element{elementCount === 1 ? "" : "s"}
+                    </span>
                     <span className={styles.statusPill} data-sent={d.status === "SENT" ? "true" : "false"}>
                       {d.status === "SENT" ? "Sent" : "Draft"}
                     </span>

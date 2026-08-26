@@ -32,9 +32,17 @@ const NAV = [
   { href: "/portal", label: "Client Portal", icon: IconGlobe },
 ];
 
+// The canvas editor is a full-screen workspace, like Canva's own editor —
+// no room (or need) for the app's own nav alongside it. It has its own
+// Home button back to My Designs, so nothing is lost by hiding this.
+function isFullScreenRoute(pathname: string | null) {
+  return /^\/design-engine\/studio\/[^/]+/.test(pathname ?? "");
+}
+
 export function Sidebar({ userName, userInitials }: { userName: string; userInitials: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const fullScreen = isFullScreenRoute(pathname);
 
   // Longest-prefix match, so "/design-engine/sent" doesn't also light up
   // the parent "/design-engine" item (and similar nested routes).
@@ -54,6 +62,8 @@ export function Sidebar({ userName, userInitials }: { userName: string; userInit
       };
     }
   }, [open]);
+
+  if (fullScreen) return null;
 
   return (
     <>

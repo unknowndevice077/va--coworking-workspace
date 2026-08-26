@@ -1,4 +1,4 @@
-import type { CanvasDoc, DesignElement } from "./types";
+import type { CanvasDoc, CanvasPage, DesignElement } from "./types";
 import { GIcon } from "./icons";
 
 const fontStacks = {
@@ -86,11 +86,16 @@ export function ElementContent({ el }: { el: DesignElement }) {
   }
 }
 
-/** A fully static render of a whole doc — thumbnails, the client portal, and PNG export. */
-export function DocSurface({ doc }: { doc: CanvasDoc }) {
-  const sorted = [...doc.elements].sort((a, b) => a.zIndex - b.zIndex);
+/**
+ * A fully static render of one page of a doc — thumbnails, the page-strip,
+ * the client portal, and PNG export. Defaults to the first page, so every
+ * existing single-page caller keeps working unchanged.
+ */
+export function DocSurface({ doc, page }: { doc: CanvasDoc; page?: CanvasPage }) {
+  const p = page ?? doc.pages[0];
+  const sorted = [...p.elements].sort((a, b) => a.zIndex - b.zIndex);
   return (
-    <div style={{ width: doc.width, height: doc.height, background: doc.background, position: "relative", overflow: "hidden" }}>
+    <div style={{ width: doc.width, height: doc.height, background: p.background, position: "relative", overflow: "hidden" }}>
       {sorted.map((el) => (
         <div
           key={el.id}

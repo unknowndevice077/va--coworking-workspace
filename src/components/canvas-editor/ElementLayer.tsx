@@ -24,6 +24,7 @@ export function ElementLayer({
   onStopEditing,
   onChange,
   onCommitText,
+  onInteractionStart,
 }: {
   el: DesignElement;
   scale: number;
@@ -34,6 +35,11 @@ export function ElementLayer({
   onStopEditing: () => void;
   onChange: (patch: Partial<DesignElement>) => void;
   onCommitText: (text: string) => void;
+  /** Fired once, right as a drag or resize gesture begins (before the first
+   * onChange) — this is where the caller should snapshot undo history,
+   * since onChange itself fires on every pointermove and is far too
+   * frequent to snapshot on. */
+  onInteractionStart: () => void;
 }) {
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ corner: Corner; startX: number; startY: number; orig: { x: number; y: number; w: number; h: number } } | null>(null);
@@ -43,6 +49,7 @@ export function ElementLayer({
     e.stopPropagation();
     onSelect();
     if (e.button !== 0) return;
+    onInteractionStart();
     dragRef.current = { startX: e.clientX, startY: e.clientY, origX: el.x, origY: el.y };
     const move = (ev: PointerEvent) => {
       const d = dragRef.current;
@@ -63,6 +70,7 @@ export function ElementLayer({
   function handleResizePointerDown(e: React.PointerEvent, corner: Corner) {
     e.stopPropagation();
     e.preventDefault();
+    onInteractionStart();
     resizeRef.current = { corner, startX: e.clientX, startY: e.clientY, orig: { x: el.x, y: el.y, w: el.w, h: el.h } };
     const move = (ev: PointerEvent) => {
       const r = resizeRef.current;

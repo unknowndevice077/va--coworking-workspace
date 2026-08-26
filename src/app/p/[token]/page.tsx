@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DocSurface } from "@/lib/canvas-doc/render";
-import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
+import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { approveDesignAction, requestChangesAction } from "./actions";
 import { IconFile } from "@/components/icons";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
@@ -66,8 +66,8 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             <div className={styles.pt}>Designs</div>
             {client.designApprovals.length === 0 && <div style={{ color: "var(--sub)", fontSize: 13 }}>No designs yet.</div>}
             {client.designApprovals.map((approval) => {
-              if (!isValidDoc(approval.doc)) return null;
-              const doc = approval.doc as CanvasDoc;
+              const doc = normalizeDoc(approval.doc);
+              if (!doc) return null;
               return (
                 <div className={styles.approval} key={approval.id}>
                   <div className={styles.thumb}>
