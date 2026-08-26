@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { findTemplate } from "@/lib/graphic-templates";
+import { DocSurface } from "@/lib/canvas-doc/render";
+import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import shell from "@/components/AppShell.module.css";
 import styles from "../design-engine.module.css";
@@ -30,19 +31,19 @@ export default async function MyDesignsPage() {
       ) : (
         <div className={`${styles.results} staggerChildren`}>
           {designs.map((d) => {
-            const template = findTemplate(d.templateId);
-            if (!template) return null;
+            if (!isValidDoc(d.doc)) return null;
+            const doc = d.doc as CanvasDoc;
             return (
               <Link href={`/design-engine/studio/${d.id}`} className={styles.tcard} key={d.id} style={{ display: "block" }}>
                 <div className={styles.thumb}>
-                  <ScaledCanvas width={template.width} height={template.height}>
-                    <template.Component values={d.fields as Record<string, string>} hue={d.hue} editable={false} />
+                  <ScaledCanvas width={doc.width} height={doc.height}>
+                    <DocSurface doc={doc} />
                   </ScaledCanvas>
                 </div>
                 <div className={styles.tbody}>
                   <div className={styles.tname}>{d.name}</div>
                   <div className={styles.tmeta}>
-                    <span className={styles.tcat}>{template.category}</span>
+                    <span className={styles.tcat}>{doc.elements.length} element{doc.elements.length === 1 ? "" : "s"}</span>
                     <span className={styles.statusPill} data-sent={d.status === "SENT" ? "true" : "false"}>
                       {d.status === "SENT" ? "Sent" : "Draft"}
                     </span>

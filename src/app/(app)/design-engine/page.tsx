@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { matchTemplates, templateCategories, defaultFieldValues, type TemplateCategory } from "@/lib/graphic-templates";
-import { IconSparkle, IconArrowRight } from "@/components/icons";
+import { matchPresets, templateCategories, type TemplateCategory } from "@/lib/canvas-doc/presets";
+import { DocSurface } from "@/lib/canvas-doc/render";
+import { IconSparkle, IconArrowRight, IconPlus } from "@/components/icons";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import { createDesignAction } from "./actions";
 import shell from "@/components/AppShell.module.css";
@@ -14,14 +15,14 @@ export default async function DesignEnginePage({
   const { q = "", category = "All" } = await searchParams;
   const cat = (templateCategories as readonly string[]).includes(category) ? (category as TemplateCategory) : "All";
 
-  const results = matchTemplates(q, { category: cat === "All" ? "All" : cat, limit: 12 });
+  const results = matchPresets(q, { category: cat === "All" ? "All" : cat, limit: 12 });
 
   return (
     <div>
       <div className={shell.topline}>
         <h1 className={shell.h1}>
           Design Engine
-          <span className={shell.h1sub}>Describe what you need, then design it yourself in the studio — nothing reaches a client until you send it.</span>
+          <span className={shell.h1sub}>A fully editable canvas, Canva-style — drag, resize, add anything. Nothing reaches a client until you send it.</span>
         </h1>
         <Link href="/design-engine/studio" className={shell.btnGhost}>My Designs →</Link>
       </div>
@@ -30,7 +31,7 @@ export default async function DesignEnginePage({
         <div className={styles.badgeRow}>
           <span className={styles.smartBadge}>
             <IconSparkle />
-            SMART TEMPLATES · REAL GRAPHICS, NOT COLOR BLOCKS
+            SMART TEMPLATES · FULLY EDITABLE CANVAS
           </span>
         </div>
         <form method="get" className={styles.promptbox}>
@@ -69,12 +70,22 @@ export default async function DesignEnginePage({
         ))}
       </div>
 
+      {cat !== "All" && (
+        <form action={createDesignAction} style={{ marginBottom: 16 }}>
+          <input type="hidden" name="category" value={cat} />
+          <button className={shell.btn} type="submit">
+            <IconPlus />
+            Start blank {cat.toLowerCase()}
+          </button>
+        </form>
+      )}
+
       <div className={`${styles.results} staggerChildren`}>
         {results.map((t) => (
           <div className={styles.tcard} key={t.id}>
             <div className={styles.thumb}>
-              <ScaledCanvas width={t.width} height={t.height}>
-                <t.Component values={defaultFieldValues(t)} hue={t.defaultHue} editable={false} />
+              <ScaledCanvas width={t.doc.width} height={t.doc.height}>
+                <DocSurface doc={t.doc} />
               </ScaledCanvas>
             </div>
             <div className={styles.tbody}>

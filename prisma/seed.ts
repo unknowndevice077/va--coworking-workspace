@@ -1,6 +1,14 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { findTemplate, defaultFieldValues } from "../src/lib/graphic-templates";
+import { findPreset } from "../src/lib/canvas-doc/presets";
+import type { CanvasDoc } from "../src/lib/canvas-doc/types";
+
+function withText(doc: CanvasDoc, matchText: string, newText: string): CanvasDoc {
+  return {
+    ...doc,
+    elements: doc.elements.map((el) => (el.type === "text" && el.text === matchText ? { ...el, text: newText } : el)),
+  };
+}
 
 const prisma = new PrismaClient();
 
@@ -131,36 +139,27 @@ async function main() {
     ],
   });
 
-  const sentTemplate = findTemplate("bold-quote-card")!;
+  const sentPreset = findPreset("local-tip-pubmat")!;
+  const sentDoc = withText(sentPreset.doc, "[Agent Name]", "Jamie Rios");
   await prisma.designApproval.create({
     data: {
       clientId: brightleaf.id,
-      templateId: sentTemplate.id,
+      templateId: sentPreset.id,
       status: "PENDING",
-      promptText: "customer quote card",
-      fields: {
-        ...defaultFieldValues(sentTemplate),
-        quote: "“Brightleaf made our fall launch effortless.”",
-        authorName: "Elena Cho",
-        authorTitle: "Owner, Brightleaf Studio",
-      } satisfies Record<string, string> as Prisma.InputJsonValue,
-      hue: sentTemplate.defaultHue,
+      promptText: "insurance tip pubmat",
+      doc: sentDoc as unknown as Prisma.InputJsonValue,
     },
   });
 
   // A private draft, sitting in the VA's own studio — not sent to anyone,
   // to demonstrate the "My Designs" library on a fresh seed.
-  const draftTemplate = findTemplate("event-flyer")!;
+  const draftPreset = findPreset("event-flyer")!;
+  const draftDoc = withText(withText(draftPreset.doc, "Brightleaf Studio", "Coastal Realty Group"), "Fall Open House", "Waterfront Open House");
   await prisma.design.create({
     data: {
-      templateId: draftTemplate.id,
+      templateId: draftPreset.id,
       name: "Coastal Realty — open house flyer",
-      fields: {
-        ...defaultFieldValues(draftTemplate),
-        brand: "Coastal Realty Group",
-        eventTitle: "Waterfront Open House",
-      } satisfies Record<string, string> as Prisma.InputJsonValue,
-      hue: draftTemplate.defaultHue,
+      doc: draftDoc as unknown as Prisma.InputJsonValue,
       promptText: "open house flyer for coastal realty",
       status: "DRAFT",
     },

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { findTemplate } from "@/lib/graphic-templates";
+import { DocSurface } from "@/lib/canvas-doc/render";
+import { isValidDoc, type CanvasDoc } from "@/lib/canvas-doc/types";
 import { approveDesignAction, requestChangesAction } from "./actions";
 import { IconFile } from "@/components/icons";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
@@ -65,18 +66,17 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             <div className={styles.pt}>Designs</div>
             {client.designApprovals.length === 0 && <div style={{ color: "var(--sub)", fontSize: 13 }}>No designs yet.</div>}
             {client.designApprovals.map((approval) => {
-              const template = findTemplate(approval.templateId);
+              if (!isValidDoc(approval.doc)) return null;
+              const doc = approval.doc as CanvasDoc;
               return (
                 <div className={styles.approval} key={approval.id}>
                   <div className={styles.thumb}>
-                    {template && (
-                      <ScaledCanvas width={template.width} height={template.height}>
-                        <template.Component values={approval.fields as Record<string, string>} hue={approval.hue} editable={false} />
-                      </ScaledCanvas>
-                    )}
+                    <ScaledCanvas width={doc.width} height={doc.height}>
+                      <DocSurface doc={doc} />
+                    </ScaledCanvas>
                   </div>
                   <div className={styles.appinfo}>
-                    <div className={styles.appname}>{template?.name ?? "Design"}</div>
+                    <div className={styles.appname}>Design</div>
                     <div className={styles.appmeta}>From your VA&apos;s design studio</div>
                     {approval.status === "PENDING" ? (
                       <div className={styles.appbtns}>
