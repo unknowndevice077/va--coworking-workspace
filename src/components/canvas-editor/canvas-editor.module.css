@@ -1,117 +1,402 @@
-.editorLayout {
+/* ============================================================
+   Studio shell — a full app-like workspace on desktop (edge to
+   edge inside the sidebar), a normal flowing page on mobile.
+   ============================================================ */
+.studioShell {
   display: flex;
-  align-items: flex-start;
-  gap: 18px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  min-height: 70vh;
+}
+@media (min-width: 901px) {
+  .studioShell {
+    margin: -28px -34px;
+    height: 100vh;
+  }
 }
 
-/* ---------- Left rail: add elements ---------- */
-.leftRail {
+/* ---------- Top bar ----------
+   A fixed brand-gradient bar, always the same in light or dark mode —
+   this is the one piece of editor chrome that deliberately doesn't
+   follow the app theme, same as Canva's own top bar never does. */
+.topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  background: linear-gradient(90deg, #00c4cc 0%, #2f6fed 55%, #5b3df6 100%);
+  color: #fff;
+}
+.homeBtn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  transition: background-color 0.15s ease;
+}
+.homeBtn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+.homeBtn svg {
+  width: 17px;
+  height: 17px;
+}
+.topbarDivider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.28);
+  flex-shrink: 0;
+}
+.nameInput {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  border: 1.5px solid transparent;
+  background: none;
+  border-radius: 5px;
+  padding: 6px 9px;
+  min-width: 120px;
+  max-width: 260px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.nameInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+.nameInput:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.nameInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.14);
+}
+.statusText {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+}
+.topbarSpacer {
+  flex: 1;
+}
+.topbarGhostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 7.5px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+.topbarGhostBtn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+.topbarGhostBtn svg {
+  width: 14px;
+  height: 14px;
+}
+.topbarSaveBtn {
+  background: #fff;
+  color: #2f6fed;
+  border: none;
+  border-radius: 6px;
+  padding: 8.5px 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.topbarSaveBtn:hover {
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+}
+.saveError {
+  margin: 0;
+  border-radius: 0;
+}
+
+/* ---------- Bottom info bar ---------- */
+.bottomBar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  font-size: 11px;
+  color: var(--sub);
+}
+.zoomReadout {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Workspace: rail + flyout + canvas + right panel ---------- */
+.workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+}
+@media (min-width: 901px) {
+  .workspace {
+    overflow: hidden;
+  }
+}
+
+/* ---------- Left icon rail ----------
+   Plain icon-over-label items, no colored pill behind them — the active
+   section is just recolored, the way Canva's own rail reads. */
+.rail {
   flex: 0 0 84px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: stretch;
+  gap: 4px;
+  padding: 14px 6px;
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
 }
 .railBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   border: none;
   background: none;
   font-family: inherit;
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text);
-  padding: 10px 4px;
-  border-radius: 6px;
+  padding: 12px 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: color 0.15s ease;
 }
 .railBtn:hover {
-  background: var(--tag-bg);
+  color: var(--accent);
+}
+.railBtnOn {
+  color: var(--accent);
+  font-weight: 700;
 }
 .railIcon {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-radius: 6px;
+}
+.railIcon svg {
+  width: 23px;
+  height: 23px;
 }
 
-/* ---------- Canvas ---------- */
-.canvasCol {
-  flex: 1 1 460px;
-  min-width: 260px;
-  max-width: 760px;
+/* ---------- Flyout panel ---------- */
+.flyout {
+  flex: 0 0 240px;
+  padding: 18px 16px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+.flyoutTitle {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--sub);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.textSample {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-family: "Source Serif 4", Georgia, serif;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.textSample:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.shapeRow {
+  display: flex;
+  gap: 8px;
+}
+.shapeBtn {
+  flex: 1;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.shapeBtn:hover {
+  border-color: var(--accent);
+}
+.uploadDropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  border: 1.5px dashed var(--border);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 22px 10px;
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.uploadDropzone:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.uploadDropzone svg {
+  width: 20px;
+  height: 20px;
+}
+.uploadGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.uploadThumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.uploadThumb:hover {
+  transform: scale(1.04);
+}
+
+/* ---------- Canvas area ---------- */
+.canvasArea {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  overflow: auto;
+  background: var(--bg);
 }
 .canvasScaleWrap {
   position: relative;
   width: 100%;
+  max-width: 620px;
   overflow: hidden;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  box-shadow: 0 14px 32px -18px rgba(0, 0, 0, 0.35);
-  background: repeating-conic-gradient(#e9e9e6 0% 25%, #fff 0% 50%) 50% / 20px 20px;
+  border-radius: 4px;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+  background: #fff;
 }
 .canvasInner {
   position: absolute;
   top: 0;
   left: 0;
   transform-origin: top left;
+  -webkit-user-select: none;
   user-select: none;
-}
-.canvasHint {
-  font-size: 11.5px;
-  color: var(--sub);
-  margin-top: 10px;
-  text-align: center;
 }
 
 /* ---------- Right panel ---------- */
 .rightPanel {
   flex: 0 0 270px;
-  min-width: 240px;
-  max-width: 310px;
+  padding: 16px;
+  background: var(--card);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
 }
-.tabRow {
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.panelHeaderLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+.panelHeaderActions {
   display: flex;
   gap: 4px;
-  background: var(--tag-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 3px;
-  margin-bottom: 16px;
 }
-.tabBtn {
-  flex: 1;
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: none;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--sub);
-  padding: 8px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
+  color: var(--text);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease;
 }
-.tabBtn:hover {
-  color: var(--text);
+.iconBtn:hover {
+  background: var(--tag-bg);
 }
-.tabActive {
-  background: var(--card);
-  color: var(--text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+
+.emptyPanel {
+  padding: 30px 10px;
+  text-align: center;
+}
+.emptyPanelIcon {
+  color: var(--sub);
+  opacity: 0.5;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.discardForm {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 
 .propGroup {
@@ -131,7 +416,6 @@
   font-size: 12px;
   color: var(--sub);
   line-height: 1.5;
-  padding: 6px 0 4px;
 }
 .divider {
   height: 1px;
@@ -237,8 +521,8 @@
 
 .iconGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 .iconChoice {
   aspect-ratio: 1;
@@ -246,13 +530,15 @@
   align-items: center;
   justify-content: center;
   border: 1.5px solid var(--border);
-  border-radius: 5px;
-  background: var(--card);
+  border-radius: 6px;
+  background: var(--bg);
   color: var(--text);
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 .iconChoice:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 .iconChoiceOn {
   background: var(--accent-soft);
@@ -271,42 +557,44 @@
   cursor: pointer;
 }
 
-.sentTitle {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--sub);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.sentRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 0;
-  border-top: 1px solid var(--border);
-  font-size: 12.5px;
-}
-.sentRow:first-of-type {
-  border-top: none;
-}
-.sentStatus {
-  color: var(--sub);
-  text-transform: capitalize;
-}
-
 @media (max-width: 900px) {
-  .editorLayout {
+  .workspace {
     flex-direction: column;
   }
-  .leftRail {
+  .rail {
     flex-direction: row;
     width: 100%;
     overflow-x: auto;
+    overflow-y: visible;
   }
-  .canvasCol,
-  .rightPanel {
-    max-width: none;
+  .flyout {
+    flex: 0 0 auto;
     width: 100%;
+    max-height: 260px;
+  }
+  .canvasArea {
+    padding: 18px;
+  }
+  .rightPanel {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: none;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .topbar {
+    flex-wrap: wrap;
+  }
+  .nameInput {
+    order: 1;
+    flex: 1 1 160px;
+  }
+  .statusText {
+    order: 2;
+  }
+  .topbarSpacer {
+    order: 3;
+    flex-basis: 100%;
+    height: 0;
   }
 }

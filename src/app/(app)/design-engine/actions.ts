@@ -106,37 +106,29 @@ export async function deleteDesignAction(formData: FormData) {
 }
 
 /**
- * The explicit, separate "send" step: snapshots the canvas's current
- * content into a DesignApproval so the client sees exactly what's on
- * screen — nothing reaches them until this runs.
+ * The explicit, separate "send" step, kicked off from the My Designs
+ * library (not the canvas editor — the editor is design-and-save only).
+ * Snapshots the design's last-saved content into a DesignApproval so the
+ * client sees exactly that — nothing reaches them until this runs. A
+ * plain form action (no useActionState) since it's fired from a card in
+ * a list, not a dedicated form with its own inline error state.
  */
-export async function sendDesignAction(_prevState: { error?: string } | undefined, formData: FormData) {
+export async function sendDesignAction(formData: FormData) {
   const user = await getCurrentUser();
-  if (!user) return { error: "Not signed in." };
+  if (!user) redirect("/login");
 
   const designId = String(formData.get("designId") ?? "");
   const clientId = String(formData.get("clientId") ?? "");
-  const docRaw = String(formData.get("doc") ?? "");
-  if (!designId || !clientId) return { error: "Pick a client first." };
-
-  let doc: CanvasDoc;
-  try {
-    doc = JSON.parse(docRaw);
-  } catch {
-    return { error: "Couldn't read the design's content." };
-  }
-  if (!isValidDoc(doc)) return { error: "Couldn't read the design's content." };
+  if (!designId || !clientId) redirect("/design-engine/studio");
 
   const design = await prisma.design.findUnique({ where: { id: designId } });
-  if (!design) return { error: "Design not found." };
+  if (!design || !isValidDoc(design.doc)) redirect("/design-engine/studio");
+  const doc = design.doc as unknown as CanvasDoc;
 
-  // Sending snapshots whatever is currently on the canvas — including
-  // edits made but not yet explicitly saved — and persists that same
-  // content back onto the draft, so nothing gets silently lost.
   await prisma.$transaction([
     prisma.design.update({
       where: { id: designId },
-      data: { doc: doc as unknown as Prisma.InputJsonValue, status: "SENT" },
+      data: { status: "SENT" },
     }),
     prisma.designApproval.create({
       data: {
@@ -153,5 +145,6 @@ export async function sendDesignAction(_prevState: { error?: string } | undefine
   revalidatePath(`/clients/${clientId}`);
   revalidatePath(`/design-engine/studio/${designId}`);
   revalidatePath("/design-engine/studio");
-  redirect(`/clients/${clientId}`);
+  revalidatePath("/design-engine/sent");
+  redirect("/design-engine/sent");
 }

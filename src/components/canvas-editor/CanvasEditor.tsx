@@ -8,35 +8,70 @@ import { ExportCanvas } from "@/components/graphic/ExportCanvas";
 import { DocSurface } from "@/lib/canvas-doc/render";
 import { newElId } from "@/lib/canvas-doc/types";
 import type { CanvasDoc, DesignElement, DistributiveOmit } from "@/lib/canvas-doc/types";
-import { updateDesignAction, sendDesignAction, deleteDesignAction } from "@/app/(app)/design-engine/actions";
-import shell from "@/components/AppShell.module.css";
+import { gIcons, type GIconName } from "@/lib/canvas-doc/icons";
+import { updateDesignAction, deleteDesignAction } from "@/app/(app)/design-engine/actions";
 import loginStyles from "@/app/login/login.module.css";
 import styles from "./canvas-editor.module.css";
 
 type DesignRow = { id: string; name: string; doc: CanvasDoc; status: string };
+type Panel = "text" | "elements" | "uploads" | "background" | null;
 
 const BG_SWATCHES = ["#ffffff", "#f4f3f0", "#131b26", "#1f4b36", "#5c1f2e", "#163a4d", "#0f2a44", "#eaf3ec"];
+const ICON_CHOICES = Object.keys(gIcons) as GIconName[];
 
 function nextZ(elements: DesignElement[]) {
   return elements.reduce((m, e) => Math.max(m, e.zIndex), 0) + 1;
 }
 
-export function CanvasEditor({
-  design,
-  clients,
-  approvals,
-}: {
-  design: DesignRow;
-  clients: { id: string; name: string }[];
-  approvals: { id: string; status: string; clientName: string }[];
-}) {
-  const [tab, setTab] = useState<"edit" | "send">("edit");
+// ---------- Small stroke icons for the left rail, matching the app's set ----------
+function RailIconText() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 6h14M12 6v13" />
+    </svg>
+  );
+}
+function RailIconElements() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="10" width="9" height="9" rx="1.5" />
+      <circle cx="16.5" cy="7.5" r="4.2" />
+    </svg>
+  );
+}
+function RailIconUploads() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 15V4M8 8l4-4 4 4" />
+      <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </svg>
+  );
+}
+function RailIconBackground() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />
+    </svg>
+  );
+}
+function RailIconDownload() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4v11M8 11l4 4 4-4" />
+      <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    </svg>
+  );
+}
+
+export function CanvasEditor({ design, sentCount }: { design: DesignRow; sentCount: number }) {
   const [name, setName] = useState(design.name);
   const [doc, setDoc] = useState<CanvasDoc>(design.doc);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [scale, setScale] = useState(0.001);
   const [downloading, setDownloading] = useState(false);
+  const [panel, setPanel] = useState<Panel>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +79,6 @@ export function CanvasEditor({
   const exportDocRef = useRef<Document | null>(null);
 
   const [saveState, saveAction, savePending] = useActionState(updateDesignAction, undefined);
-  const [sendState, sendActionFn, sendPending] = useActionState(sendDesignAction, undefined);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -115,24 +149,29 @@ export function CanvasEditor({
     const id = newElId();
     setDoc((d) => ({ ...d, elements: [...d.elements, { ...el, id, zIndex: nextZ(d.elements), rotation: 0 } as DesignElement] }));
     setSelectedId(id);
-    setTab("edit");
   }
 
-  function addText() {
-    const w = Math.round(doc.width * 0.5);
+  function addText(variant: "heading" | "subheading" | "body") {
+    const presets = {
+      heading: { fontSize: 44, fontWeight: 700 as const, fontFamily: "display" as const, text: "Add a heading" },
+      subheading: { fontSize: 24, fontWeight: 600 as const, fontFamily: "display" as const, text: "Add a subheading" },
+      body: { fontSize: 16, fontWeight: 400 as const, fontFamily: "body" as const, text: "Add a little bit of body text" },
+    };
+    const p = presets[variant];
+    const w = Math.round(doc.width * (variant === "body" ? 0.55 : 0.6));
     addElement({
       type: "text",
       x: Math.round((doc.width - w) / 2),
-      y: Math.round(doc.height / 2 - 30),
+      y: Math.round(doc.height / 2 - p.fontSize),
       w,
-      h: 60,
-      text: "Double-click to edit",
-      fontFamily: "body",
-      fontSize: 28,
-      fontWeight: 600,
+      h: Math.round(p.fontSize * 1.6),
+      text: p.text,
+      fontFamily: p.fontFamily,
+      fontSize: p.fontSize,
+      fontWeight: p.fontWeight,
       color: "#131b26",
       align: "left",
-      lineHeight: 1.2,
+      lineHeight: 1.25,
     });
   }
 
@@ -152,15 +191,29 @@ export function CanvasEditor({
     });
   }
 
-  function addIcon() {
+  function addIcon(icon: GIconName) {
     addElement({
       type: "icon",
       x: Math.round(doc.width / 2 - 32),
       y: Math.round(doc.height / 2 - 32),
       w: 64,
       h: 64,
-      icon: "sparkle",
+      icon,
       color: "#131b26",
+    });
+  }
+
+  function addImage(src: string) {
+    const w = Math.round(doc.width * 0.4);
+    const h = Math.round(w * 0.7);
+    addElement({
+      type: "image",
+      x: Math.round((doc.width - w) / 2),
+      y: Math.round((doc.height - h) / 2),
+      w,
+      h,
+      src,
+      radius: 8,
     });
   }
 
@@ -171,17 +224,8 @@ export function CanvasEditor({
     const reader = new FileReader();
     reader.onload = () => {
       const src = String(reader.result);
-      const w = Math.round(doc.width * 0.4);
-      const h = Math.round(w * 0.7);
-      addElement({
-        type: "image",
-        x: Math.round((doc.width - w) / 2),
-        y: Math.round((doc.height - h) / 2),
-        w,
-        h,
-        src,
-        radius: 8,
-      });
+      setUploadedImages((u) => [src, ...u]);
+      addImage(src);
     };
     reader.readAsDataURL(file);
   }
@@ -210,56 +254,161 @@ export function CanvasEditor({
     }
   }
 
+  function togglePanel(p: Exclude<Panel, null>) {
+    setPanel((cur) => (cur === p ? null : p));
+  }
+
   const sortedElements = [...doc.elements].sort((a, b) => a.zIndex - b.zIndex);
   const docJson = JSON.stringify(doc);
 
-  return (
-    <div>
-      <div className={shell.topline}>
-        <h1 className={shell.h1}>
-          {name || "Untitled design"}
-          <span className={shell.h1sub}>
-            {design.status === "SENT" ? "Sent to a client" : "Draft — only you can see this"} · {doc.elements.length} element{doc.elements.length === 1 ? "" : "s"}
-          </span>
-        </h1>
-        <Link href="/design-engine/studio" className={shell.btnGhost}>← My Designs</Link>
-      </div>
+  const statusLabel =
+    design.status === "SENT"
+      ? `Sent · ${sentCount} client${sentCount === 1 ? "" : "s"}`
+      : "Draft · private to you";
 
-      <div className={styles.editorLayout}>
-        <div className={styles.leftRail}>
-          <button type="button" className={styles.railBtn} onClick={addText}>
-            <span className={styles.railIcon} aria-hidden="true">T</span>
+  return (
+    <div className={styles.studioShell}>
+      {/* ---------- Top bar ---------- */}
+      <div className={styles.topbar}>
+        <Link href="/design-engine/studio" className={styles.homeBtn} aria-label="Back to My Designs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 10.5 12 4l9 6.5" />
+            <path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5" />
+          </svg>
+        </Link>
+        <div className={styles.topbarDivider} />
+        <input
+          className={styles.nameInput}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          aria-label="Design name"
+        />
+        <span className={styles.statusText}>{statusLabel}</span>
+        <div className={styles.topbarSpacer} />
+        <button type="button" className={styles.topbarGhostBtn} disabled={downloading} onClick={handleDownload}>
+          <RailIconDownload />
+          {downloading ? "Rendering…" : "Download PNG"}
+        </button>
+        <form action={saveAction}>
+          <input type="hidden" name="id" value={design.id} />
+          <input type="hidden" name="name" value={name} />
+          <input type="hidden" name="doc" value={docJson} />
+          <button className={styles.topbarSaveBtn} type="submit" disabled={savePending}>
+            {savePending ? "Saving…" : saveState?.saved ? "Saved ✓" : "Save"}
+          </button>
+        </form>
+      </div>
+      {saveState?.error && <div className={`${loginStyles.error} ${styles.saveError}`}>{saveState.error}</div>}
+
+      {/* ---------- Workspace ---------- */}
+      <div className={styles.workspace}>
+        <div className={styles.rail}>
+          <button type="button" className={`${styles.railBtn} ${panel === "text" ? styles.railBtnOn : ""}`} onClick={() => togglePanel("text")}>
+            <span className={styles.railIcon}><RailIconText /></span>
             Text
           </button>
-          <button type="button" className={styles.railBtn} onClick={() => addShape("rect")}>
-            <span className={styles.railIcon} aria-hidden="true" style={{ borderRadius: 3 }}>▭</span>
-            Rectangle
+          <button type="button" className={`${styles.railBtn} ${panel === "elements" ? styles.railBtnOn : ""}`} onClick={() => togglePanel("elements")}>
+            <span className={styles.railIcon}><RailIconElements /></span>
+            Elements
           </button>
-          <button type="button" className={styles.railBtn} onClick={() => addShape("ellipse")}>
-            <span className={styles.railIcon} aria-hidden="true">●</span>
-            Circle
+          <button type="button" className={`${styles.railBtn} ${panel === "uploads" ? styles.railBtnOn : ""}`} onClick={() => togglePanel("uploads")}>
+            <span className={styles.railIcon}><RailIconUploads /></span>
+            Uploads
           </button>
-          <button type="button" className={styles.railBtn} onClick={() => addShape("line")}>
-            <span className={styles.railIcon} aria-hidden="true">—</span>
-            Line
-          </button>
-          <button type="button" className={styles.railBtn} onClick={addIcon}>
-            <span className={styles.railIcon} aria-hidden="true">✦</span>
-            Icon
-          </button>
-          <button type="button" className={styles.railBtn} onClick={() => fileInputRef.current?.click()}>
-            <span className={styles.railIcon} aria-hidden="true">▨</span>
-            Image
+          <button type="button" className={`${styles.railBtn} ${panel === "background" ? styles.railBtnOn : ""}`} onClick={() => togglePanel("background")}>
+            <span className={styles.railIcon}><RailIconBackground /></span>
+            Background
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleImagePick} />
         </div>
 
-        <div className={styles.canvasCol}>
-          <div
-            ref={wrapRef}
-            className={styles.canvasScaleWrap}
-            style={{ aspectRatio: `${doc.width} / ${doc.height}` }}
-          >
+        {panel && (
+          <div className={styles.flyout}>
+            {panel === "text" && (
+              <div>
+                <div className={styles.flyoutTitle}>Add text</div>
+                <button type="button" className={styles.textSample} style={{ fontSize: 22, fontWeight: 700 }} onClick={() => addText("heading")}>
+                  Add a heading
+                </button>
+                <button type="button" className={styles.textSample} style={{ fontSize: 16, fontWeight: 600 }} onClick={() => addText("subheading")}>
+                  Add a subheading
+                </button>
+                <button type="button" className={styles.textSample} style={{ fontSize: 13, fontWeight: 400 }} onClick={() => addText("body")}>
+                  Add a little bit of body text
+                </button>
+              </div>
+            )}
+
+            {panel === "elements" && (
+              <div>
+                <div className={styles.flyoutTitle}>Shapes</div>
+                <div className={styles.shapeRow}>
+                  <button type="button" className={styles.shapeBtn} onClick={() => addShape("rect")} aria-label="Rectangle">
+                    <span style={{ width: 26, height: 20, background: "var(--text)", borderRadius: 3 }} />
+                  </button>
+                  <button type="button" className={styles.shapeBtn} onClick={() => addShape("ellipse")} aria-label="Circle">
+                    <span style={{ width: 22, height: 22, background: "var(--text)", borderRadius: "50%" }} />
+                  </button>
+                  <button type="button" className={styles.shapeBtn} onClick={() => addShape("line")} aria-label="Line">
+                    <span style={{ width: 26, height: 3, background: "var(--text)" }} />
+                  </button>
+                </div>
+                <div className={styles.flyoutTitle} style={{ marginTop: 18 }}>Icons</div>
+                <div className={styles.iconGrid}>
+                  {ICON_CHOICES.map((n) => (
+                    <button key={n} type="button" className={styles.iconChoice} onClick={() => addIcon(n)} aria-label={`Add ${n} icon`}>
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                        <path d={gIcons[n]} />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {panel === "uploads" && (
+              <div>
+                <div className={styles.flyoutTitle}>Uploads</div>
+                <button type="button" className={styles.uploadDropzone} onClick={() => fileInputRef.current?.click()}>
+                  <RailIconUploads />
+                  Upload an image
+                </button>
+                {uploadedImages.length > 0 && (
+                  <div className={styles.uploadGrid}>
+                    {uploadedImages.map((src, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={i} src={src} alt="" className={styles.uploadThumb} onClick={() => addImage(src)} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {panel === "background" && (
+              <div>
+                <div className={styles.flyoutTitle}>Canvas background</div>
+                <div className={styles.swatchRow}>
+                  {BG_SWATCHES.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-label={`Background ${c}`}
+                      className={`${styles.swatch} ${doc.background.toLowerCase() === c ? styles.swatchOn : ""}`}
+                      style={{ background: c, border: c === "#ffffff" ? "1px solid var(--border)" : undefined }}
+                      onClick={() => setDoc((d) => ({ ...d, background: c }))}
+                    />
+                  ))}
+                  <label className={styles.customSwatch} style={{ background: doc.background }}>
+                    <input type="color" value={doc.background} onChange={(e) => setDoc((d) => ({ ...d, background: e.target.value }))} />
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className={styles.canvasArea}>
+          <div ref={wrapRef} className={styles.canvasScaleWrap} style={{ aspectRatio: `${doc.width} / ${doc.height}` }}>
             <div
               className={styles.canvasInner}
               style={{ width: doc.width, height: doc.height, background: doc.background, transform: `scale(${scale})` }}
@@ -284,9 +433,6 @@ export function CanvasEditor({
               ))}
             </div>
           </div>
-          <div className={styles.canvasHint}>
-            Drag to move, corner handles to resize, double-click text to edit. Delete/Backspace removes the selected element.
-          </div>
         </div>
 
         {/* Off-screen, always full-resolution — this is what actually gets captured for PNG export. */}
@@ -302,121 +448,35 @@ export function CanvasEditor({
         </ExportCanvas>
 
         <div className={styles.rightPanel}>
-          <div className={styles.tabRow}>
-            <button type="button" className={`${styles.tabBtn} ${tab === "edit" ? styles.tabActive : ""}`} onClick={() => setTab("edit")}>
-              Edit design
-            </button>
-            <button type="button" className={`${styles.tabBtn} ${tab === "send" ? styles.tabActive : ""}`} onClick={() => setTab("send")}>
-              Send to client
-            </button>
-          </div>
+          <PropertiesPanel
+            el={selected}
+            onChange={(patch) => selectedId && updateElement(selectedId, patch)}
+            onDelete={() => selectedId && removeElement(selectedId)}
+            onDuplicate={() => selectedId && duplicateElement(selectedId)}
+            onBringForward={() => selectedId && reorder(selectedId, 1)}
+            onSendBackward={() => selectedId && reorder(selectedId, -1)}
+          />
 
-          {tab === "edit" ? (
-            <div>
-              <div className={styles.propGroup}>
-                <div className={styles.propLabel}>Draft name</div>
-                <input className={loginStyles.input} value={name} onChange={(e) => setName(e.target.value)} />
-              </div>
-
-              <div className={styles.propGroup}>
-                <div className={styles.propLabel}>Canvas background</div>
-                <div className={styles.swatchRow}>
-                  {BG_SWATCHES.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      aria-label={`Background ${c}`}
-                      className={`${styles.swatch} ${doc.background.toLowerCase() === c ? styles.swatchOn : ""}`}
-                      style={{ background: c, border: c === "#ffffff" ? "1px solid var(--border)" : undefined }}
-                      onClick={() => setDoc((d) => ({ ...d, background: c }))}
-                    />
-                  ))}
-                  <label className={styles.customSwatch} style={{ background: doc.background }}>
-                    <input type="color" value={doc.background} onChange={(e) => setDoc((d) => ({ ...d, background: e.target.value }))} />
-                  </label>
-                </div>
-              </div>
-
-              <div className={styles.divider} />
-
-              <PropertiesPanel
-                el={selected}
-                onChange={(patch) => selectedId && updateElement(selectedId, patch)}
-                onDelete={() => selectedId && removeElement(selectedId)}
-                onDuplicate={() => selectedId && duplicateElement(selectedId)}
-                onBringForward={() => selectedId && reorder(selectedId, 1)}
-                onSendBackward={() => selectedId && reorder(selectedId, -1)}
-              />
-
-              <div className={styles.divider} />
-
-              <form action={saveAction} className={loginStyles.form}>
-                <input type="hidden" name="id" value={design.id} />
-                <input type="hidden" name="name" value={name} />
-                <input type="hidden" name="doc" value={docJson} />
-                {saveState?.error && <div className={loginStyles.error}>{saveState.error}</div>}
-                <button className={loginStyles.btn} type="submit" disabled={savePending}>
-                  {savePending ? "Saving…" : saveState?.saved ? "Saved ✓" : "Save draft"}
-                </button>
-                <button type="button" className={shell.btnGhost} disabled={downloading} onClick={handleDownload} style={{ width: "100%" }}>
-                  {downloading ? "Rendering…" : "Download PNG"}
-                </button>
-              </form>
-
-              {design.status === "DRAFT" && (
-                <form action={deleteDesignAction} style={{ marginTop: 10 }}>
-                  <input type="hidden" name="id" value={design.id} />
-                  <button
-                    type="submit"
-                    className={styles.linkBtn}
-                    onClick={(e) => {
-                      if (!confirm("Discard this draft? This can't be undone.")) e.preventDefault();
-                    }}
-                  >
-                    Discard this draft
-                  </button>
-                </form>
-              )}
-            </div>
-          ) : (
-            <div>
-              <form action={sendActionFn} className={loginStyles.form}>
-                <input type="hidden" name="designId" value={design.id} />
-                <input type="hidden" name="doc" value={docJson} />
-                <label className={loginStyles.label}>
-                  Send to client
-                  <select className={loginStyles.input} name="clientId" required>
-                    {clients.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </label>
-                <p className={loginStyles.sub} style={{ margin: 0 }}>
-                  Delivers the design exactly as shown to their portal for approval. Nothing is sent until you click below.
-                </p>
-                {sendState?.error && <div className={loginStyles.error}>{sendState.error}</div>}
-                <button className={loginStyles.btn} type="submit" disabled={sendPending}>
-                  {sendPending ? "Sending…" : "Send for approval"}
-                </button>
-                <button type="button" className={shell.btnGhost} disabled={downloading} onClick={handleDownload} style={{ width: "100%" }}>
-                  {downloading ? "Rendering…" : "Download PNG"}
-                </button>
-              </form>
-
-              {approvals.length > 0 && (
-                <div style={{ marginTop: 22 }}>
-                  <div className={styles.sentTitle}>Already sent to</div>
-                  {approvals.map((a) => (
-                    <div key={a.id} className={styles.sentRow}>
-                      <span>{a.clientName}</span>
-                      <span className={styles.sentStatus}>{a.status.replace("_", " ").toLowerCase()}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          {design.status === "DRAFT" && (
+            <form action={deleteDesignAction} className={styles.discardForm}>
+              <input type="hidden" name="id" value={design.id} />
+              <button
+                type="submit"
+                className={styles.linkBtn}
+                onClick={(e) => {
+                  if (!confirm("Discard this draft? This can't be undone.")) e.preventDefault();
+                }}
+              >
+                Discard this draft
+              </button>
+            </form>
           )}
         </div>
+      </div>
+
+      <div className={styles.bottomBar}>
+        <span>Drag to move, corner handles to resize, double-click text to edit</span>
+        <span className={styles.zoomReadout}>{doc.width} × {doc.height}px · {Math.round(scale * 100)}%</span>
       </div>
     </div>
   );

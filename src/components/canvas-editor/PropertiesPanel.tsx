@@ -45,11 +45,40 @@ export function PropertiesPanel({
   onSendBackward: () => void;
 }) {
   if (!el) {
-    return <div className={styles.hint}>Click an element on the canvas to edit its style, or add a new one from the left.</div>;
+    return (
+      <div className={styles.emptyPanel}>
+        <div className={styles.emptyPanelIcon} aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="m7 15 3.5-4.5L13 14l2-2.5L20 15" />
+          </svg>
+        </div>
+        <div className={styles.hint}>Click an element on the canvas to edit its style, or add a new one from the left.</div>
+      </div>
+    );
   }
+
+  const typeLabel = el.type === "text" ? "Text" : el.type === "shape" ? "Shape" : el.type === "icon" ? "Icon" : "Image";
 
   return (
     <div className={styles.propsCol}>
+      <div className={styles.panelHeader}>
+        <span className={styles.panelHeaderLabel}>{typeLabel}</span>
+        <div className={styles.panelHeaderActions}>
+          <button type="button" className={styles.iconBtn} onClick={onDuplicate} aria-label="Duplicate">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <rect x="8" y="8" width="12" height="12" rx="2" />
+              <path d="M4 16V6a2 2 0 0 1 2-2h10" />
+            </svg>
+          </button>
+          <button type="button" className={styles.iconBtn} onClick={onDelete} aria-label="Delete" style={{ color: "var(--bad)" }}>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       {el.type === "text" && (
         <>
           <div className={styles.propGroup}>
@@ -206,11 +235,6 @@ export function PropertiesPanel({
           <button type="button" className={styles.segBtn} onClick={onBringForward}>Forward</button>
           <button type="button" className={styles.segBtn} onClick={onSendBackward}>Backward</button>
         </div>
-      </div>
-
-      <div className={styles.propGroup} style={{ display: "flex", gap: 8 }}>
-        <button type="button" className={styles.chipBtn} onClick={onDuplicate} style={{ flex: 1 }}>Duplicate</button>
-        <button type="button" className={styles.chipBtn} onClick={onDelete} style={{ flex: 1, color: "var(--bad)" }}>Delete</button>
       </div>
     </div>
   );

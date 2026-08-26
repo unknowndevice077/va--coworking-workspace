@@ -15,6 +15,7 @@ import {
   IconReceipt,
   IconInbox,
   IconGlobe,
+  IconCheck,
   IconMenu,
   IconX,
 } from "./icons";
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/clients", label: "Clients", icon: IconUsers },
   { href: "/projects", label: "Projects", icon: IconBoard },
   { href: "/design-engine", label: "Design Engine", icon: IconSparkle },
+  { href: "/design-engine/sent", label: "Finished Designs", icon: IconCheck },
   { href: "/calendar", label: "Calendar", icon: IconCalendar },
   { href: "/invoices", label: "Invoices", icon: IconReceipt },
   { href: "/inbox", label: "Inbox", icon: IconInbox },
@@ -33,6 +35,10 @@ const NAV = [
 export function Sidebar({ userName, userInitials }: { userName: string; userInitials: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Longest-prefix match, so "/design-engine/sent" doesn't also light up
+  // the parent "/design-engine" item (and similar nested routes).
+  const activeHref = [...NAV].sort((a, b) => b.href.length - a.href.length).find((item) => pathname?.startsWith(item.href))?.href;
 
   // Close the drawer whenever the route changes.
   useEffect(() => {
@@ -83,7 +89,7 @@ export function Sidebar({ userName, userInitials }: { userName: string; userInit
           </button>
         </div>
         {NAV.map((item) => {
-          const active = pathname?.startsWith(item.href);
+          const active = item.href === activeHref;
           const Icon = item.icon;
           return (
             <Link key={item.href} href={item.href} className={`${styles.navitem} ${active ? styles.active : ""}`}>

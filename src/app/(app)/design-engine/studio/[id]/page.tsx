@@ -9,11 +9,10 @@ export default async function DesignStudioDetailPage({ params }: { params: Promi
 
   const design = await prisma.design.findUnique({
     where: { id },
-    include: { approvals: { include: { client: true }, orderBy: { createdAt: "desc" } } },
+    include: { approvals: true },
   });
   if (!design) notFound();
 
-  const clients = await prisma.client.findMany({ orderBy: { name: "asc" } });
   // A design saved before this shape existed, or with corrupted content —
   // open it as a blank canvas rather than crashing the page.
   const doc: CanvasDoc = isValidDoc(design.doc) ? design.doc : blankDoc("Social Post");
@@ -26,8 +25,7 @@ export default async function DesignStudioDetailPage({ params }: { params: Promi
         doc,
         status: design.status,
       }}
-      clients={clients}
-      approvals={design.approvals.map((a) => ({ id: a.id, status: a.status, clientName: a.client.name }))}
+      sentCount={design.approvals.length}
     />
   );
 }
