@@ -16,11 +16,19 @@ import loginStyles from "@/app/login/login.module.css";
 import styles from "./canvas-editor.module.css";
 
 type DesignRow = { id: string; name: string; doc: CanvasDoc; status: string };
-type Panel = "text" | "elements" | "templates" | "uploads" | "background" | null;
+type Panel = "text" | "elements" | "templates" | "uploads" | "background" | "resize" | null;
 
 const BG_SWATCHES = ["#ffffff", "#f4f3f0", "#131b26", "#1f4b36", "#5c1f2e", "#163a4d", "#0f2a44", "#eaf3ec"];
 const ICON_CHOICES = Object.keys(gIcons) as GIconName[];
 const HISTORY_CAP = 50;
+const CANVAS_SIZES = [
+  { label: "Square post", w: 1080, h: 1080 },
+  { label: "Story / Reel", w: 1080, h: 1920 },
+  { label: "Landscape post", w: 1200, h: 630 },
+  { label: "Flyer", w: 1080, h: 1350 },
+  { label: "Business card", w: 1050, h: 600 },
+  { label: "Presentation", w: 1920, h: 1080 },
+];
 
 function nextZ(elements: DesignElement[]) {
   return elements.reduce((m, e) => Math.max(m, e.zIndex), 0) + 1;
@@ -64,6 +72,13 @@ function RailIconBackground() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />
+    </svg>
+  );
+}
+function RailIconResize() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 9V4h5M20 15v5h-5M20 4l-7 7M4 20l7-7" />
     </svg>
   );
 }
@@ -129,6 +144,8 @@ export function CanvasEditor({ design, sentCount }: { design: DesignRow; sentCou
   const fileInputRef = useRef<HTMLInputElement>(null);
   const exportNodeRef = useRef<HTMLDivElement | null>(null);
   const exportDocRef = useRef<Document | null>(null);
+  const resizeWRef = useRef<HTMLInputElement>(null);
+  const resizeHRef = useRef<HTMLInputElement>(null);
 
   // Kept in sync every render so the undo/redo keyboard handler (registered
   // once, deps [selectedId, editingId]) always sees the latest doc/history
@@ -367,6 +384,27 @@ export function CanvasEditor({ design, sentCount }: { design: DesignRow; sentCou
     commit(mapCurrentPage((p) => ({ ...p, background: bg })));
   }
 
+  // Resize the whole canvas (every page) — scales every element's
+  // position, size and font size proportionally, the way Canva's own
+  // Resize does, rather than just changing the frame and clipping.
+  function resizeCanvas(newW: number, newH: number) {
+    const w = Math.round(newW);
+    const h = Math.round(newH);
+    if (w < 40 || h < 40 || (w === doc.width && h === doc.height)) return;
+    const sx = w / doc.width;
+    const sy = h / doc.height;
+    const scaleEl = (el: DesignElement): DesignElement => {
+      const base = { ...el, x: Math.round(el.x * sx), y: Math.round(el.y * sy), w: Math.round(el.w * sx), h: Math.round(el.h * sy) };
+      return base.type === "text" ? { ...base, fontSize: Math.max(6, Math.round(base.fontSize * ((sx + sy) / 2))) } : base;
+    };
+    commit({
+      width: w,
+      height: h,
+      pages: docRef.current.pages.map((p) => ({ ...p, elements: p.elements.map(scaleEl) })),
+    });
+    setPanel(null);
+  }
+
   function applyTemplate(presetId: string) {
     const preset = templatePresets.find((t) => t.id === presetId);
     if (!preset) return;
@@ -515,6 +553,10 @@ export function CanvasEditor({ design, sentCount }: { design: DesignRow; sentCou
             <span className={styles.railIcon}><RailIconBackground /></span>
             Background
           </button>
+          <button type="button" className={`${styles.railBtn} ${panel === "resize" ? styles.railBtnOn : ""}`} onClick={() => togglePanel("resize")}>
+            <span className={styles.railIcon}><RailIconResize /></span>
+            Resize
+          </button>
           <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleImagePick} />
         </div>
 
@@ -617,6 +659,37 @@ export function CanvasEditor({ design, sentCount }: { design: DesignRow; sentCou
                     <input type="color" value={currentPage.background} onChange={(e) => setPageBackground(e.target.value)} />
                   </label>
                 </div>
+              </div>
+            )}
+
+            {panel === "resize" && (
+              <div>
+                <div className={styles.flyoutTitle}>Resize canvas</div>
+                <div className={styles.hint} style={{ marginBottom: 12 }}>
+                  Scales every element on every page to fit — nothing gets clipped.
+                </div>
+                <div className={styles.sizePresetGrid}>
+                  {CANVAS_SIZES.map((s) => (
+                    <button key={s.label} type="button" className={styles.sizePresetBtn} onClick={() => resizeCanvas(s.w, s.h)}>
+                      <span>{s.label}</span>
+                      <span className={styles.sizePresetDims}>{s.w} × {s.h}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.flyoutTitle} style={{ marginTop: 18 }}>Custom size</div>
+                <div className={styles.customSizeRow}>
+                  <input ref={resizeWRef} type="number" defaultValue={doc.width} min={40} max={4000} aria-label="Width" />
+                  <span>×</span>
+                  <input ref={resizeHRef} type="number" defaultValue={doc.height} min={40} max={4000} aria-label="Height" />
+                </div>
+                <button
+                  type="button"
+                  className={styles.chipBtn}
+                  style={{ width: "100%", marginTop: 10 }}
+                  onClick={() => resizeCanvas(Number(resizeWRef.current?.value) || doc.width, Number(resizeHRef.current?.value) || doc.height)}
+                >
+                  Apply
+                </button>
               </div>
             )}
           </div>

@@ -3,6 +3,90 @@
   color: var(--sub);
   margin-bottom: 22px;
 }
+
+.blankRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.customSizeForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.customSizeLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--sub);
+  white-space: nowrap;
+}
+.customSizeForm input[type="number"] {
+  width: 76px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 9px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+}
+.customSizeForm span {
+  font-size: 12.5px;
+  color: var(--sub);
+}
+
+/* ---------- Auto Design ---------- */
+.autoForm {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px 26px;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.autoField {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.autoLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.autoForm textarea,
+.autoForm select,
+.autoForm input[type="file"] {
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 11px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical;
+}
+.autoForm textarea:focus,
+.autoForm select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.autoRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.autoHint {
+  font-size: 11.5px;
+  color: var(--sub);
+  line-height: 1.5;
+  margin: 0;
+}
 .promptPanel {
   background: var(--card);
   border: 1px solid var(--border);

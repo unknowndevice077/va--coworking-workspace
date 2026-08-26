@@ -141,3 +141,17 @@ model DesignApproval {
   promptText String
   createdAt  DateTime @default(now())
 }
+
+// A VA's private video project — a sequence of clips (video or image) on
+// one track, each with an optional text overlay. `doc` is a VideoDoc
+// (src/lib/video-doc/types.ts): { width, height, clips: VideoClip[] }.
+// Clip media is stored as data URIs inside `doc` itself, same approach as
+// Design's `doc` — simplest thing that works at this project's scale, no
+// object storage to wire up.
+model VideoProject {
+  id        String   @id @default(cuid())
+  name      String
+  doc       Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

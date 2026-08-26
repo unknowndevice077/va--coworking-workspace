@@ -15,7 +15,7 @@ export default async function DesignEnginePage({
   const { q = "", category = "All" } = await searchParams;
   const cat = (templateCategories as readonly string[]).includes(category) ? (category as TemplateCategory) : "All";
 
-  const results = matchPresets(q, { category: cat === "All" ? "All" : cat, limit: 12 });
+  const results = matchPresets(q, { category: cat === "All" ? "All" : cat, limit: 40 });
 
   return (
     <div>
@@ -24,7 +24,13 @@ export default async function DesignEnginePage({
           Design Engine
           <span className={shell.h1sub}>A fully editable canvas, Canva-style — drag, resize, add anything. Nothing reaches a client until you send it.</span>
         </h1>
-        <Link href="/design-engine/studio" className={shell.btnGhost}>My Designs →</Link>
+        <div style={{ display: "flex", gap: 10 }}>
+          <Link href="/design-engine/auto" className={shell.btn}>
+            <IconSparkle />
+            Auto Design
+          </Link>
+          <Link href="/design-engine/studio" className={shell.btnGhost}>My Designs →</Link>
+        </div>
       </div>
 
       <div className={styles.promptPanel}>
@@ -70,15 +76,25 @@ export default async function DesignEnginePage({
         ))}
       </div>
 
-      {cat !== "All" && (
-        <form action={createDesignAction} style={{ marginBottom: 16 }}>
-          <input type="hidden" name="category" value={cat} />
-          <button className={shell.btn} type="submit">
-            <IconPlus />
-            Start blank {cat.toLowerCase()}
-          </button>
+      <div className={styles.blankRow}>
+        {cat !== "All" && (
+          <form action={createDesignAction}>
+            <input type="hidden" name="category" value={cat} />
+            <button className={shell.btn} type="submit">
+              <IconPlus />
+              Start blank {cat.toLowerCase()}
+            </button>
+          </form>
+        )}
+        <form action={createDesignAction} className={styles.customSizeForm}>
+          <span className={styles.customSizeLabel}>Custom size:</span>
+          <input type="number" name="customWidth" placeholder="Width" min={100} max={4000} required />
+          <span>×</span>
+          <input type="number" name="customHeight" placeholder="Height" min={100} max={4000} required />
+          <span>px</span>
+          <button className={shell.btnGhost} type="submit">Create blank canvas</button>
         </form>
-      )}
+      </div>
 
       <div className={`${styles.results} staggerChildren`}>
         {results.map((t) => (

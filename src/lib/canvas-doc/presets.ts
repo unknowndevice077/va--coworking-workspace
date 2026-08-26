@@ -1,4 +1,6 @@
+import { newElId } from "./types";
 import type { CanvasDoc, CanvasPage, DesignElement, DistributiveOmit, TemplateCategory, TemplatePreset } from "./types";
+import type { GIconName } from "./icons";
 
 export type { TemplateCategory } from "./types";
 
@@ -532,6 +534,306 @@ const statHighlightSlide: TemplatePreset = {
   ]),
 };
 
+// ============================================================
+// A general small-business pubmat family — same anatomy as the
+// real-estate set (brand header, footer), deliberately varied palette
+// and layout per business type so the library isn't one look repeated.
+// ============================================================
+function bizHeader(deep: string, icon: GIconName, tag: string, tagWidth = 200): RawEl[] {
+  return [
+    { type: "shape", shape: "rect", x: 0, y: 0, w: 1080, h: 96, fill: deep, radius: 0, opacity: 1 },
+    { type: "icon", x: 40, y: 33, w: 30, h: 30, icon, color: "#ffffff" },
+    { type: "text", x: 82, y: 36, w: 400, h: 26, text: "[Business Name]", fontFamily: "display", fontSize: 16, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 1040 - tagWidth, y: 28, w: tagWidth, h: 40, fill: "rgba(255,255,255,0.16)", radius: 20, opacity: 1, stroke: "rgba(255,255,255,0.35)", strokeWidth: 1 },
+    { type: "text", x: 1040 - tagWidth, y: 40, w: tagWidth, h: 20, text: tag, fontFamily: "body", fontSize: 12, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1 },
+  ];
+}
+function bizFooter(deep: string): RawEl[] {
+  return [
+    { type: "shape", shape: "rect", x: 0, y: 980, w: 1080, h: 100, fill: deep, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 1000, w: 400, h: 24, text: "[Business Name]", fontFamily: "display", fontSize: 15, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 1030, w: 400, h: 20, text: "[Website] · [Phone]", fontFamily: "body", fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.75)", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 780, y: 1015, w: 240, h: 24, text: "@[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "#ffffff", align: "right", lineHeight: 1.2 },
+  ];
+}
+
+// ---------- Cafe Daily Special (Social Post, 1080x1080) ----------
+const p11 = { deep: "#3a2416", mid: "#8a5a35", tint: "#f5ead9", tint2: "#ecd9bd" };
+const cafeDailySpecial: TemplatePreset = {
+  id: "cafe-daily-special",
+  name: "Cafe Daily Special",
+  category: "Social Post",
+  keywords: ["cafe", "coffee", "bakery", "daily special", "menu", "food", "drink"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    ...bizHeader(p11.deep, "leaf", "Daily Special"),
+    ...rePhotoPlaceholder(60, 130, 960, 380).map((el) => (el.type === "shape" ? { ...el, fill: p11.tint, stroke: p11.mid } : { ...el, color: p11.mid })),
+    { type: "text", x: 60, y: 540, w: 700, h: 60, text: "Maple Pecan Latte", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p11.deep, align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "rect", x: 790, y: 540, w: 230, h: 56, fill: p11.deep, radius: 28, opacity: 1 },
+    { type: "text", x: 790, y: 558, w: 230, h: 24, text: "$5.50", fontFamily: "display", fontSize: 20, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1 },
+    { type: "text", x: 60, y: 618, w: 800, h: 60, text: "House espresso, steamed oat milk, maple syrup, toasted pecan — back for fall.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: p11.mid, align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 60, y: 820, w: 960, h: 84, fill: p11.tint2, radius: 14, opacity: 1, stroke: p11.mid, strokeWidth: 1.5 },
+    { type: "text", x: 60, y: 850, w: 960, h: 30, text: "Today only — stop by before we sell out", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p11.deep, align: "center", lineHeight: 1.2 },
+    ...bizFooter(p11.deep),
+  ]),
+};
+
+// ---------- Fitness Class Schedule (Flyer, 1080x1350) ----------
+const p12 = { deep: "#14161a", neon: "#c6ff3d", tint: "#22262c" };
+const fitnessSchedule: TemplatePreset = {
+  id: "fitness-schedule",
+  name: "Fitness Class Schedule",
+  category: "Flyer",
+  keywords: ["fitness", "gym", "class schedule", "workout", "yoga", "studio", "week"],
+  doc: finalize(1080, 1350, p12.deep, [
+    { type: "icon", x: 60, y: 70, w: 34, h: 34, icon: "bolt", color: p12.neon },
+    { type: "text", x: 110, y: 76, w: 500, h: 34, text: "[Studio Name]", fontFamily: "display", fontSize: 20, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 150, w: 960, h: 90, text: "This Week's Classes", fontFamily: "display", fontSize: 48, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "line", x: 60, y: 260, w: 90, h: 4, fill: p12.neon, radius: 0, opacity: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 310, w: 960, h: 90, fill: p12.tint, radius: 12, opacity: 1 },
+    { type: "text", x: 90, y: 336, w: 140, h: 30, text: "MON", fontFamily: "display", fontSize: 15, fontWeight: 700, color: p12.neon, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 336, w: 500, h: 30, text: "6:00 AM — Sunrise Yoga", fontFamily: "body", fontSize: 17, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 412, w: 960, h: 90, fill: p12.tint, radius: 12, opacity: 1 },
+    { type: "text", x: 90, y: 438, w: 140, h: 30, text: "WED", fontFamily: "display", fontSize: 15, fontWeight: 700, color: p12.neon, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 438, w: 500, h: 30, text: "5:30 PM — HIIT Circuit", fontFamily: "body", fontSize: 17, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 514, w: 960, h: 90, fill: p12.tint, radius: 12, opacity: 1 },
+    { type: "text", x: 90, y: 540, w: 140, h: 30, text: "FRI", fontFamily: "display", fontSize: 15, fontWeight: 700, color: p12.neon, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 540, w: 500, h: 30, text: "6:00 PM — Strength & Core", fontFamily: "body", fontSize: 17, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 616, w: 960, h: 90, fill: p12.tint, radius: 12, opacity: 1 },
+    { type: "text", x: 90, y: 642, w: 140, h: 30, text: "SAT", fontFamily: "display", fontSize: 15, fontWeight: 700, color: p12.neon, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 642, w: 500, h: 30, text: "9:00 AM — Open Gym", fontFamily: "body", fontSize: 17, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 1150, w: 960, h: 100, fill: p12.neon, radius: 14, opacity: 1 },
+    { type: "text", x: 60, y: 1180, w: 960, h: 40, text: "First class free — just show up", fontFamily: "display", fontSize: 20, fontWeight: 700, color: p12.deep, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 1300, w: 960, h: 24, text: "[studioname.com]  ·  @[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Salon Service Menu (Social Post, 1080x1080) ----------
+const p13 = { deep: "#7a2e3a", gold: "#c79a4b", blush: "#f7e6e6", ink: "#6b4a4e" };
+const salonServiceMenu: TemplatePreset = {
+  id: "salon-service-menu",
+  name: "Salon Service Menu",
+  category: "Social Post",
+  keywords: ["salon", "beauty", "hair", "nails", "spa", "service menu", "price list"],
+  doc: finalize(1080, 1080, p13.blush, [
+    ...bizHeader(p13.deep, "sparkle", "Service Menu"),
+    { type: "text", x: 0, y: 140, w: 1080, h: 60, text: "This Season's Services", fontFamily: "display", fontSize: 30, fontWeight: 700, color: p13.deep, align: "center", lineHeight: 1.1 },
+    { type: "shape", shape: "rect", x: 90, y: 240, w: 900, h: 620, fill: "#ffffff", radius: 18, opacity: 1 },
+    { type: "text", x: 130, y: 280, w: 600, h: 28, text: "Signature Cut & Style", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p13.deep, align: "left", lineHeight: 1 },
+    { type: "text", x: 850, y: 280, w: 100, h: 28, text: "$65", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p13.gold, align: "right", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 130, y: 324, w: 820, h: 1.5, fill: p13.blush, radius: 0, opacity: 1 },
+    { type: "text", x: 130, y: 350, w: 600, h: 28, text: "Balayage", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p13.deep, align: "left", lineHeight: 1 },
+    { type: "text", x: 850, y: 350, w: 100, h: 28, text: "$180", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p13.gold, align: "right", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 130, y: 394, w: 820, h: 1.5, fill: p13.blush, radius: 0, opacity: 1 },
+    { type: "text", x: 130, y: 420, w: 600, h: 28, text: "Gel Manicure", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p13.deep, align: "left", lineHeight: 1 },
+    { type: "text", x: 850, y: 420, w: 100, h: 28, text: "$40", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p13.gold, align: "right", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 130, y: 464, w: 820, h: 1.5, fill: p13.blush, radius: 0, opacity: 1 },
+    { type: "text", x: 130, y: 490, w: 600, h: 28, text: "Deep Conditioning Treatment", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p13.deep, align: "left", lineHeight: 1 },
+    { type: "text", x: 850, y: 490, w: 100, h: 28, text: "$35", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p13.gold, align: "right", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 130, y: 534, w: 820, h: 1.5, fill: p13.blush, radius: 0, opacity: 1 },
+    { type: "text", x: 130, y: 560, w: 600, h: 28, text: "Facial + Brow Shape", fontFamily: "display", fontSize: 18, fontWeight: 600, color: p13.deep, align: "left", lineHeight: 1 },
+    { type: "text", x: 850, y: 560, w: 100, h: 28, text: "$70", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p13.gold, align: "right", lineHeight: 1 },
+    { type: "text", x: 130, y: 780, w: 820, h: 50, text: "Book your appointment — link in bio", fontFamily: "body", fontSize: 15, fontWeight: 500, color: p13.ink, align: "center", lineHeight: 1.4 },
+    ...bizFooter(p13.deep),
+  ]),
+};
+
+// ---------- Restaurant Featured Dish (Social Post, 1080x1080) ----------
+const p14 = { deep: "#5a1a1a", mid: "#8a3b2a", cream: "#f6ecd9" };
+const restaurantFeaturedDish: TemplatePreset = {
+  id: "restaurant-featured-dish",
+  name: "Restaurant Featured Dish",
+  category: "Social Post",
+  keywords: ["restaurant", "dish", "menu", "special", "food", "chef", "dinner"],
+  doc: finalize(1080, 1080, p14.deep, [
+    { type: "text", x: 0, y: 100, w: 1080, h: 30, text: "CHEF'S FEATURE", fontFamily: "body", fontSize: 14, fontWeight: 700, color: p14.cream, align: "center", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 90, y: 160, w: 900, h: 500, fill: p14.mid, radius: 18, opacity: 1 },
+    { type: "text", x: 0, y: 700, w: 1080, h: 70, text: "Braised Short Rib", fontFamily: "display", fontSize: 46, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.1 },
+    { type: "text", x: 140, y: 780, w: 800, h: 60, text: "Slow-braised 8 hours, root vegetable purée, red wine jus.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "rgba(255,255,255,0.75)", align: "center", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 440, y: 860, w: 200, h: 56, fill: p14.cream, radius: 28, opacity: 1 },
+    { type: "text", x: 440, y: 878, w: 200, h: 24, text: "$32", fontFamily: "display", fontSize: 20, fontWeight: 700, color: p14.deep, align: "center", lineHeight: 1 },
+    ...bizFooter(p14.deep),
+  ]),
+};
+
+// ---------- Non-profit Donation Drive (Flyer, 1080x1350) ----------
+const p15 = { teal: "#0d5c5c", orange: "#e8752c", cream: "#eef7f5" };
+const donationDrive: TemplatePreset = {
+  id: "donation-drive",
+  name: "Non-profit Donation Drive",
+  category: "Flyer",
+  keywords: ["nonprofit", "donation", "fundraiser", "charity", "drive", "goal", "give"],
+  doc: finalize(1080, 1350, "#ffffff", [
+    ...bizHeader(p15.teal, "leaf", "Fundraiser"),
+    { type: "text", x: 60, y: 150, w: 960, h: 130, text: "Help us reach our goal", fontFamily: "display", fontSize: 46, fontWeight: 700, color: p15.teal, align: "left", lineHeight: 1.15 },
+    { type: "text", x: 60, y: 300, w: 900, h: 60, text: "Every dollar goes straight to families in our community this winter.", fontFamily: "body", fontSize: 17, fontWeight: 400, color: "#5c6b63", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 60, y: 400, w: 960, h: 26, fill: p15.cream, radius: 13, opacity: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 400, w: 650, h: 26, fill: p15.orange, radius: 13, opacity: 1 },
+    { type: "text", x: 60, y: 440, w: 500, h: 26, text: "$13,000 raised", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p15.teal, align: "left", lineHeight: 1 },
+    { type: "text", x: 560, y: 440, w: 460, h: 26, text: "of $20,000 goal", fontFamily: "body", fontSize: 15, fontWeight: 500, color: "#5c6b63", align: "right", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 60, y: 540, w: 960, h: 560, fill: p15.cream, radius: 16, opacity: 1 },
+    { type: "shape", shape: "rect", x: 0, y: 1180, w: 1080, h: 100, fill: p15.orange, radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 1210, w: 1080, h: 40, text: "Give today at [website.org/give]", fontFamily: "display", fontSize: 20, fontWeight: 600, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    ...bizFooter(p15.teal),
+  ]),
+};
+
+// ---------- Tutoring Session Booking (Social Post, 1080x1080) ----------
+const p16 = { indigo: "#2b2467", yellow: "#f4c95d", tint: "#ece9fb" };
+const tutoringBooking: TemplatePreset = {
+  id: "tutoring-booking",
+  name: "Tutoring Session Booking",
+  category: "Social Post",
+  keywords: ["tutoring", "coaching", "lesson", "session", "education", "book", "learning"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    ...bizHeader(p16.indigo, "star", "Book a Session"),
+    { type: "text", x: 60, y: 150, w: 960, h: 140, text: "Struggling with algebra? Let's fix that.", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p16.indigo, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 300, w: 800, h: 50, text: "One-on-one sessions, tailored to how your kid actually learns.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c5a72", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 60, y: 400, w: 460, h: 220, fill: p16.tint, radius: 14, opacity: 1 },
+    { type: "text", x: 90, y: 430, w: 400, h: 30, text: "Free intro call", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p16.indigo, align: "left", lineHeight: 1 },
+    { type: "text", x: 90, y: 470, w: 400, h: 80, text: "15 minutes, no pressure — we'll figure out where to start.", fontFamily: "body", fontSize: 14, fontWeight: 400, color: "#5c5a72", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 560, y: 400, w: 460, h: 220, fill: p16.indigo, radius: 14, opacity: 1 },
+    { type: "text", x: 590, y: 430, w: 400, h: 30, text: "Weekly sessions", fontFamily: "display", fontSize: 19, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "text", x: 590, y: 470, w: 400, h: 80, text: "45 minutes, same time each week, progress reports included.", fontFamily: "body", fontSize: 14, fontWeight: 400, color: "rgba(255,255,255,0.8)", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 60, y: 820, w: 960, h: 84, fill: p16.yellow, radius: 14, opacity: 1 },
+    { type: "text", x: 60, y: 850, w: 960, h: 30, text: "Book your free intro call today", fontFamily: "display", fontSize: 18, fontWeight: 700, color: p16.indigo, align: "center", lineHeight: 1.2 },
+    ...bizFooter(p16.indigo),
+  ]),
+};
+
+// ---------- Cleaning Service Booking (Social Post, 1080x1080) ----------
+const p17 = { deep: "#1a6fa8", tint: "#e8f4fc", ink: "#3d5a6e" };
+const cleaningServiceBooking: TemplatePreset = {
+  id: "cleaning-service-booking",
+  name: "Cleaning Service Booking",
+  category: "Social Post",
+  keywords: ["cleaning", "housekeeping", "maid service", "booking", "home services"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    ...bizHeader(p17.deep, "drop", "Book Now"),
+    { type: "text", x: 60, y: 150, w: 960, h: 100, text: "A spotless home, zero effort", fontFamily: "display", fontSize: 42, fontWeight: 700, color: p17.deep, align: "left", lineHeight: 1.15 },
+    { type: "text", x: 60, y: 260, w: 800, h: 40, text: "Fully insured, background-checked, and booked in under a minute.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: p17.ink, align: "left", lineHeight: 1.4 },
+    { type: "shape", shape: "rect", x: 60, y: 340, w: 960, h: 400, fill: p17.tint, radius: 16, opacity: 1 },
+    { type: "icon", x: 100, y: 375, w: 26, h: 26, icon: "check", color: p17.deep },
+    { type: "text", x: 145, y: 378, w: 800, h: 26, text: "Kitchen & bathrooms deep-cleaned", fontFamily: "body", fontSize: 16, fontWeight: 500, color: p17.deep, align: "left", lineHeight: 1 },
+    { type: "icon", x: 100, y: 435, w: 26, h: 26, icon: "check", color: p17.deep },
+    { type: "text", x: 145, y: 438, w: 800, h: 26, text: "Dusting, vacuuming, mopping — every room", fontFamily: "body", fontSize: 16, fontWeight: 500, color: p17.deep, align: "left", lineHeight: 1 },
+    { type: "icon", x: 100, y: 495, w: 26, h: 26, icon: "check", color: p17.deep },
+    { type: "text", x: 145, y: 498, w: 800, h: 26, text: "Eco-friendly products, pet-safe", fontFamily: "body", fontSize: 16, fontWeight: 500, color: p17.deep, align: "left", lineHeight: 1 },
+    { type: "icon", x: 100, y: 555, w: 26, h: 26, icon: "check", color: p17.deep },
+    { type: "text", x: 145, y: 558, w: 800, h: 26, text: "Same cleaner every visit, if you'd like", fontFamily: "body", fontSize: 16, fontWeight: 500, color: p17.deep, align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 820, w: 960, h: 84, fill: p17.deep, radius: 14, opacity: 1 },
+    { type: "text", x: 60, y: 850, w: 960, h: 30, text: "First clean 20% off — book this week", fontFamily: "display", fontSize: 18, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    ...bizFooter(p17.deep),
+  ]),
+};
+
+// ---------- E-commerce Flash Sale (Social Post, 1080x1080) ----------
+const p18 = { black: "#0d0d0d", gold: "#d4af37" };
+const ecommerceFlashSale: TemplatePreset = {
+  id: "ecommerce-flash-sale",
+  name: "E-commerce Flash Sale",
+  category: "Social Post",
+  keywords: ["sale", "flash sale", "discount", "ecommerce", "shop", "percent off", "black friday"],
+  doc: finalize(1080, 1080, p18.black, [
+    { type: "shape", shape: "line", x: 90, y: 90, w: 900, h: 1.5, fill: "rgba(255,255,255,0.2)", radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 120, w: 1080, h: 30, text: "48 HOURS ONLY", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p18.gold, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 0, y: 220, w: 1080, h: 300, text: "40% OFF", fontFamily: "display", fontSize: 130, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1 },
+    { type: "text", x: 140, y: 530, w: 800, h: 40, text: "Everything in the store, no exclusions", fontFamily: "body", fontSize: 20, fontWeight: 400, color: "rgba(255,255,255,0.75)", align: "center", lineHeight: 1.3 },
+    { type: "shape", shape: "rect", x: 390, y: 610, w: 300, h: 66, fill: p18.gold, radius: 33, opacity: 1 },
+    { type: "text", x: 390, y: 632, w: 300, h: 24, text: "CODE: FLASH40", fontFamily: "display", fontSize: 15, fontWeight: 700, color: p18.black, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 90, y: 990, w: 900, h: 1.5, fill: "rgba(255,255,255,0.2)", radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 1015, w: 1080, h: 30, text: "[shopname.com] · @[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.65)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Law Firm Consultation (Social Post, 1080x1080) ----------
+const p19 = { navy: "#12233f", gold: "#b8863c", tint: "#eef1f6" };
+const lawFirmConsultation: TemplatePreset = {
+  id: "law-firm-consultation",
+  name: "Law Firm Consultation",
+  category: "Social Post",
+  keywords: ["law firm", "lawyer", "attorney", "legal", "consultation", "professional"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    ...bizHeader(p19.navy, "shield", "Free Consultation"),
+    { type: "icon", x: 490, y: 160, w: 100, h: 100, icon: "shield", color: "#ffffff", background: p19.navy },
+    { type: "text", x: 0, y: 300, w: 1080, h: 70, text: "When it matters, get real advice", fontFamily: "display", fontSize: 36, fontWeight: 700, color: p19.navy, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 190, y: 390, w: 700, h: 60, text: "Family, estate, and business law — a straightforward first conversation, no obligation.", fontFamily: "body", fontSize: 15.5, fontWeight: 400, color: "#5c6270", align: "center", lineHeight: 1.5 },
+    { type: "shape", shape: "line", x: 490, y: 490, w: 100, h: 2, fill: p19.gold, radius: 0, opacity: 1 },
+    { type: "shape", shape: "rect", x: 190, y: 550, w: 700, h: 260, fill: p19.tint, radius: 16, opacity: 1 },
+    { type: "text", x: 230, y: 590, w: 620, h: 26, text: "[Attorney Name], Esq.", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p19.navy, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 626, w: 620, h: 24, text: "15+ years of practice · [Bar Number]", fontFamily: "body", fontSize: 13.5, fontWeight: 500, color: p19.gold, align: "left", lineHeight: 1 },
+    { type: "text", x: 230, y: 670, w: 620, h: 90, text: "Call or email to schedule your free 20-minute consultation — evenings available.", fontFamily: "body", fontSize: 14.5, fontWeight: 400, color: "#5c6270", align: "left", lineHeight: 1.5 },
+    ...bizFooter(p19.navy),
+  ]),
+};
+
+// ---------- Podcast Episode Announcement (Social Post, 1080x1080) ----------
+const p20 = { deep: "#241a35", pink: "#d94f9c", tint: "rgba(217,79,156,0.16)" };
+const podcastEpisode: TemplatePreset = {
+  id: "podcast-episode",
+  name: "Podcast Episode Announcement",
+  category: "Social Post",
+  keywords: ["podcast", "episode", "new episode", "listen", "audio", "show"],
+  doc: finalize(1080, 1080, p20.deep, [
+    { type: "shape", shape: "ellipse", x: -180, y: -180, w: 520, h: 520, fill: p20.pink, radius: 0, opacity: 0.16 },
+    { type: "shape", shape: "rect", x: 90, y: 110, w: 220, h: 48, fill: p20.tint, radius: 24, opacity: 1, stroke: p20.pink, strokeWidth: 1 },
+    { type: "text", x: 90, y: 124, w: 220, h: 22, text: "NEW EPISODE", fontFamily: "body", fontSize: 12, fontWeight: 700, color: p20.pink, align: "center", lineHeight: 1 },
+    { type: "text", x: 90, y: 190, w: 900, h: 40, text: "EPISODE 42", fontFamily: "body", fontSize: 18, fontWeight: 600, color: "rgba(255,255,255,0.6)", align: "left", lineHeight: 1 },
+    { type: "text", x: 90, y: 240, w: 900, h: 220, text: "Why most freelancers underprice themselves", fontFamily: "display", fontSize: 52, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.15 },
+    { type: "text", x: 90, y: 480, w: 780, h: 60, text: "A conversation on pricing, confidence, and knowing your worth.", fontFamily: "body", fontSize: 18, fontWeight: 400, color: "rgba(255,255,255,0.7)", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 90, y: 590, w: 900, h: 320, fill: "rgba(255,255,255,0.06)", radius: 18, opacity: 1, stroke: "rgba(255,255,255,0.14)", strokeWidth: 1 },
+    { type: "icon", x: 500, y: 700, w: 80, h: 80, icon: "sparkle", color: p20.pink },
+    { type: "text", x: 90, y: 960, w: 900, h: 30, text: "Listen now — link in bio", fontFamily: "display", fontSize: 17, fontWeight: 600, color: p20.pink, align: "left", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Webinar Registration (Flyer, 1080x1350) ----------
+const p21 = { blue: "#123a63", mid: "#3f6d99", tint: "#e7f0fb" };
+const webinarRegistration: TemplatePreset = {
+  id: "webinar-registration",
+  name: "Webinar Registration",
+  category: "Flyer",
+  keywords: ["webinar", "event", "registration", "register", "online event", "workshop", "sign up"],
+  doc: finalize(1080, 1350, "#ffffff", [
+    ...bizHeader(p21.blue, "calendar", "Free Webinar"),
+    { type: "text", x: 60, y: 150, w: 960, h: 150, text: "5 Systems Every Small Business Needs", fontFamily: "display", fontSize: 42, fontWeight: 700, color: p21.blue, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 320, w: 900, h: 50, text: "A free, live 45-minute session — bring your questions.", fontFamily: "body", fontSize: 17, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.4 },
+    { type: "shape", shape: "rect", x: 60, y: 400, w: 473, h: 86, fill: p21.blue, radius: 14, opacity: 1 },
+    { type: "icon", x: 80, y: 420, w: 32, h: 32, icon: "calendar", color: "#ffffff" },
+    { type: "text", x: 126, y: 418, w: 300, h: 16, text: "DATE", fontFamily: "body", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", align: "left", lineHeight: 1 },
+    { type: "text", x: 126, y: 440, w: 380, h: 22, text: "Thursday, Sept 18", fontFamily: "display", fontSize: 16.5, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 547, y: 400, w: 473, h: 86, fill: p21.blue, radius: 14, opacity: 1 },
+    { type: "icon", x: 567, y: 420, w: 32, h: 32, icon: "clock", color: "#ffffff" },
+    { type: "text", x: 613, y: 418, w: 300, h: 16, text: "TIME", fontFamily: "body", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", align: "left", lineHeight: 1 },
+    { type: "text", x: 613, y: 440, w: 380, h: 22, text: "12:00 – 12:45 PM", fontFamily: "display", fontSize: 16.5, fontWeight: 600, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 520, w: 960, h: 500, fill: p21.tint, radius: 16, opacity: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 1150, w: 960, h: 100, fill: p21.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 1180, w: 960, h: 40, text: "Register free at [website.com/webinar]", fontFamily: "display", fontSize: 20, fontWeight: 600, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    ...bizFooter(p21.blue),
+  ]),
+};
+
+// ---------- Birthday / Celebration Sale (Social Post, 1080x1080) ----------
+const p22 = { plum: "#6b2749", pink: "#fbe4ec", gold: "#d9a441" };
+const celebrationSale: TemplatePreset = {
+  id: "celebration-sale",
+  name: "Birthday Celebration Sale",
+  category: "Social Post",
+  keywords: ["birthday", "anniversary", "celebration", "sale", "party", "milestone", "years"],
+  doc: finalize(1080, 1080, p22.pink, [
+    { type: "shape", shape: "ellipse", x: -160, y: -160, w: 420, h: 420, fill: p22.gold, radius: 0, opacity: 0.18 },
+    { type: "shape", shape: "ellipse", x: 820, y: 780, w: 420, h: 420, fill: p22.plum, radius: 0, opacity: 0.12 },
+    { type: "text", x: 0, y: 140, w: 1080, h: 30, text: "WE'RE CELEBRATING", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p22.plum, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 90, y: 190, w: 900, h: 180, text: "5 Years!", fontFamily: "display", fontSize: 90, fontWeight: 700, color: p22.plum, align: "center", lineHeight: 1 },
+    { type: "text", x: 140, y: 400, w: 800, h: 60, text: "Thank you for five wonderful years — let's celebrate together.", fontFamily: "body", fontSize: 18, fontWeight: 400, color: "#7a5a68", align: "center", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 240, y: 520, w: 600, h: 220, fill: "#ffffff", radius: 20, opacity: 1 },
+    { type: "text", x: 240, y: 560, w: 600, h: 50, text: "25% OFF", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p22.plum, align: "center", lineHeight: 1 },
+    { type: "text", x: 240, y: 630, w: 600, h: 60, text: "everything, this weekend only", fontFamily: "body", fontSize: 16, fontWeight: 500, color: "#7a5a68", align: "center", lineHeight: 1.3 },
+    { type: "shape", shape: "rect", x: 390, y: 800, w: 300, h: 60, fill: p22.plum, radius: 30, opacity: 1 },
+    { type: "text", x: 390, y: 820, w: 300, h: 24, text: "CODE: FIVEYEARS", fontFamily: "display", fontSize: 14, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1 },
+    { type: "text", x: 0, y: 990, w: 1080, h: 30, text: "[Business Name] · @[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "#8a6b76", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
 export const templatePresets: TemplatePreset[] = [
   localTipPubmat,
   justListed,
@@ -551,6 +853,18 @@ export const templatePresets: TemplatePreset[] = [
   minimalCard,
   pitchDeck,
   statHighlightSlide,
+  cafeDailySpecial,
+  fitnessSchedule,
+  salonServiceMenu,
+  restaurantFeaturedDish,
+  donationDrive,
+  tutoringBooking,
+  cleaningServiceBooking,
+  ecommerceFlashSale,
+  lawFirmConsultation,
+  podcastEpisode,
+  webinarRegistration,
+  celebrationSale,
 ];
 
 export const templateCategories: TemplateCategory[] = ["Logo", "Social Post", "Flyer", "Business Card", "Presentation"];
@@ -605,4 +919,86 @@ export function guessHeadline(prompt: string): string {
   if (!cleaned) return "";
   const words = cleaned.split(/\s+/).slice(0, 8).join(" ");
   return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
+ * Reflects the VA's prompt in whatever reads as the design's main headline
+ * — its largest REAL text element, on the first page. Only a genuine
+ * multi-word phrase qualifies: on most templates the biggest font belongs
+ * to a price, a stat number, or a decorative quote mark, none of which
+ * read as a headline. Mutates `doc` in place.
+ */
+export function applyPromptHeadline(doc: CanvasDoc, promptText: string): void {
+  if (!promptText.trim()) return;
+  const headline = guessHeadline(promptText);
+  const elements = doc.pages[0].elements;
+  const looksLikeHeadline = (text: string) => text.trim().length >= 4 && /\s/.test(text.trim());
+  let target: DesignElement | undefined;
+  for (const el of elements) {
+    if (
+      el.type === "text" &&
+      looksLikeHeadline(el.text) &&
+      (!target || (target.type === "text" && el.fontSize > target.fontSize))
+    ) {
+      target = el;
+    }
+  }
+  if (target && target.type === "text") target.text = headline;
+}
+
+/**
+ * Finds the element that plays "the brand mark" on a template's first page
+ * — either a big centered hero icon (an Icon Lockup-style logo) or a small
+ * icon sitting in the header's top-left corner — so an uploaded logo can
+ * drop straight into that slot instead of landing as a generic overlay.
+ * Computed from the built doc, not hardcoded per template, so it keeps
+ * working as templates change.
+ */
+function findLogoSlotIndex(doc: CanvasDoc): number | undefined {
+  const els = doc.pages[0].elements;
+  let best = -1;
+  let bestScore = -Infinity;
+  els.forEach((el, i) => {
+    if (el.type !== "icon") return;
+    const isHeroMark = el.w >= 100 && el.h >= 100;
+    const isHeaderMark = el.y < 100 && el.x < 200 && el.w <= 60;
+    if (!isHeroMark && !isHeaderMark) return;
+    const score = isHeroMark ? 100 : 50 - el.y;
+    if (score > bestScore) {
+      bestScore = score;
+      best = i;
+    }
+  });
+  return best >= 0 ? best : undefined;
+}
+
+/**
+ * Drops an uploaded logo into a template's brand-mark slot when it has one
+ * (replacing that icon with the logo image, same box), or failing that
+ * adds it as a small corner badge — always does *something* useful with
+ * the logo rather than silently dropping it. Mutates `doc` in place.
+ */
+export function applyLogo(doc: CanvasDoc, logoDataUrl: string): void {
+  const page = doc.pages[0];
+  const idx = findLogoSlotIndex(doc);
+  if (idx !== undefined) {
+    const base = page.elements[idx];
+    const radius = base.type === "shape" || base.type === "image" ? base.radius : Math.round(Math.min(base.w, base.h) * 0.15);
+    page.elements[idx] = {
+      id: base.id,
+      x: base.x,
+      y: base.y,
+      w: base.w,
+      h: base.h,
+      rotation: base.rotation,
+      zIndex: base.zIndex,
+      type: "image",
+      src: logoDataUrl,
+      radius,
+    };
+    return;
+  }
+  const size = Math.max(60, Math.min(140, Math.round(doc.width * 0.09)));
+  const z = page.elements.reduce((m, e) => Math.max(m, e.zIndex), 0) + 1;
+  page.elements.push({ id: newElId(), x: 28, y: 28, w: size, h: size, rotation: 0, zIndex: z, type: "image", src: logoDataUrl, radius: 10 });
 }

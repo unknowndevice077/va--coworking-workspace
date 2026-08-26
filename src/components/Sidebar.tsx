@@ -16,6 +16,7 @@ import {
   IconInbox,
   IconGlobe,
   IconCheck,
+  IconVideo,
   IconMenu,
   IconX,
 } from "./icons";
@@ -26,17 +27,20 @@ const NAV = [
   { href: "/projects", label: "Projects", icon: IconBoard },
   { href: "/design-engine", label: "Design Engine", icon: IconSparkle },
   { href: "/design-engine/sent", label: "Finished Designs", icon: IconCheck },
+  { href: "/videos", label: "Video Studio", icon: IconVideo },
   { href: "/calendar", label: "Calendar", icon: IconCalendar },
   { href: "/invoices", label: "Invoices", icon: IconReceipt },
   { href: "/inbox", label: "Inbox", icon: IconInbox },
   { href: "/portal", label: "Client Portal", icon: IconGlobe },
 ];
 
-// The canvas editor is a full-screen workspace, like Canva's own editor —
-// no room (or need) for the app's own nav alongside it. It has its own
-// Home button back to My Designs, so nothing is lost by hiding this.
+// The canvas and video editors are full-screen workspaces, like Canva's
+// own editor — no room (or need) for the app's own nav alongside them.
+// Both have their own Home button back to their library, so nothing is
+// lost by hiding this.
 function isFullScreenRoute(pathname: string | null) {
-  return /^\/design-engine\/studio\/[^/]+/.test(pathname ?? "");
+  const p = pathname ?? "";
+  return /^\/design-engine\/studio\/[^/]+/.test(p) || /^\/videos\/[^/]+/.test(p);
 }
 
 export function Sidebar({ userName, userInitials }: { userName: string; userInitials: string }) {

@@ -77,6 +77,15 @@ export function IconInbox({ className }: IconProps) {
   );
 }
 
+export function IconVideo({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="2.5" y="6" width="14" height="12" rx="2" />
+      <path d="m16.5 10.5 5-3v9l-5-3Z" />
+    </svg>
+  );
+}
+
 export function IconGlobe({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
