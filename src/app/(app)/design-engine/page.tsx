@@ -15,7 +15,7 @@ export default async function DesignEnginePage({
   const { q = "", category = "All" } = await searchParams;
   const cat = (templateCategories as readonly string[]).includes(category) ? (category as TemplateCategory) : "All";
 
-  const results = matchPresets(q, { category: cat === "All" ? "All" : cat, limit: 40 });
+  const results = matchPresets(q, { category: cat === "All" ? "All" : cat, limit: 80 });
 
   return (
     <div>

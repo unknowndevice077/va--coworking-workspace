@@ -834,6 +834,388 @@ const celebrationSale: TemplatePreset = {
   ]),
 };
 
+// ============================================================
+// Batch 2 — rounding out the thin categories (Logo, Business Card,
+// Presentation only had 2 each) and a handful more Social Post/Flyer
+// verticals that weren't covered yet.
+// ============================================================
+
+// ---------- Emblem Logo (Logo, 1080x1080) ----------
+const p23 = { deep: "#26332b", gold: "#c79a4b" };
+const emblemLogo: TemplatePreset = {
+  id: "emblem-logo",
+  name: "Emblem Logo",
+  category: "Logo",
+  keywords: ["logo", "emblem", "crest", "badge", "outdoors", "brewery", "classic"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    { type: "shape", shape: "ellipse", x: 240, y: 240, w: 600, h: 600, fill: "#ffffff", radius: 0, opacity: 1, stroke: p23.deep, strokeWidth: 5 },
+    { type: "shape", shape: "ellipse", x: 275, y: 275, w: 530, h: 530, fill: "#ffffff", radius: 0, opacity: 1, stroke: p23.gold, strokeWidth: 2 },
+    { type: "icon", x: 470, y: 400, w: 140, h: 140, icon: "leaf", color: p23.deep },
+    { type: "text", x: 290, y: 570, w: 500, h: 60, text: "TIMBER & CO.", fontFamily: "display", fontSize: 34, fontWeight: 700, color: p23.deep, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 440, y: 645, w: 200, h: 1.5, fill: p23.gold, radius: 0, opacity: 1 },
+    { type: "text", x: 290, y: 660, w: 500, h: 24, text: "ESTABLISHED 2016", fontFamily: "body", fontSize: 12, fontWeight: 600, color: p23.gold, align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Geometric Mark (Logo, 1080x1080) ----------
+const p24 = { deep: "#1a1a2e", accent1: "#e94560", accent2: "#0f9b8e" };
+const geometricMark: TemplatePreset = {
+  id: "geometric-mark",
+  name: "Geometric Mark",
+  category: "Logo",
+  keywords: ["logo", "geometric", "abstract", "tech", "startup", "modern", "shapes"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    { type: "shape", shape: "rect", x: 380, y: 300, w: 180, h: 180, fill: p24.deep, radius: 24, opacity: 1, rotation: 12 },
+    { type: "shape", shape: "ellipse", x: 520, y: 300, w: 180, h: 180, fill: p24.accent1, radius: 0, opacity: 0.9 },
+    { type: "shape", shape: "rect", x: 450, y: 420, w: 180, h: 180, fill: p24.accent2, radius: 24, opacity: 0.9 },
+    { type: "text", x: 190, y: 660, w: 700, h: 60, text: "Nimbus", fontFamily: "display", fontSize: 46, fontWeight: 700, color: p24.deep, align: "center", lineHeight: 1 },
+    { type: "text", x: 190, y: 726, w: 700, h: 26, text: "PRODUCT STUDIO", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "#6b6b80", align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Script Wordmark (Logo, 1080x1080) ----------
+const p25 = { ink: "#2b2420", rose: "#b5707a" };
+const scriptWordmark: TemplatePreset = {
+  id: "script-wordmark",
+  name: "Script Wordmark",
+  category: "Logo",
+  keywords: ["logo", "wordmark", "script", "boutique", "elegant", "florist", "bridal"],
+  doc: finalize(1080, 1080, "#fdfaf7", [
+    { type: "text", x: 90, y: 420, w: 900, h: 140, text: "Willow & Sage", fontFamily: "serif", fontSize: 66, fontWeight: 600, color: p25.ink, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 440, y: 570, w: 60, h: 1.5, fill: p25.rose, radius: 0, opacity: 1 },
+    { type: "icon", x: 520, y: 545, w: 40, h: 40, icon: "leaf", color: p25.rose },
+    { type: "shape", shape: "line", x: 580, y: 570, w: 60, h: 1.5, fill: p25.rose, radius: 0, opacity: 1 },
+    { type: "text", x: 90, y: 610, w: 900, h: 26, text: "FLORAL DESIGN STUDIO", fontFamily: "body", fontSize: 13, fontWeight: 600, color: p25.rose, align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Stacked Icon Logo (Logo, 1080x1080) ----------
+const p26 = { deep: "#12324d", tint: "#e7f0f7" };
+const stackedIconLogo: TemplatePreset = {
+  id: "stacked-icon-logo",
+  name: "Stacked Icon Logo",
+  category: "Logo",
+  keywords: ["logo", "minimal", "icon", "stacked", "simple", "clean", "consulting"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    { type: "shape", shape: "rect", x: 460, y: 320, w: 160, h: 160, fill: p26.tint, radius: 32, opacity: 1 },
+    { type: "icon", x: 500, y: 360, w: 80, h: 80, icon: "bolt", color: p26.deep },
+    { type: "text", x: 190, y: 540, w: 700, h: 50, text: "Vertex Consulting", fontFamily: "display", fontSize: 34, fontWeight: 700, color: p26.deep, align: "center", lineHeight: 1 },
+    { type: "text", x: 190, y: 598, w: 700, h: 24, text: "STRATEGY · GROWTH · OPERATIONS", fontFamily: "body", fontSize: 12.5, fontWeight: 600, color: "#5c7180", align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Bold Color Block Card (Business Card, 1050x600) ----------
+const p27 = { orange: "#e2601a", ink: "#20140c", cream: "#fdf3e7" };
+const boldColorBlockCard: TemplatePreset = {
+  id: "bold-color-block-card",
+  name: "Bold Color Block Card",
+  category: "Business Card",
+  keywords: ["business card", "bold", "colorful", "creative", "agency"],
+  doc: finalize(1050, 600, p27.cream, [
+    { type: "shape", shape: "rect", x: 0, y: 0, w: 1050, h: 210, fill: p27.orange, radius: 0, opacity: 1 },
+    { type: "text", x: 40, y: 240, w: 600, h: 50, text: "Maya Osei", fontFamily: "display", fontSize: 30, fontWeight: 700, color: p27.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 40, y: 296, w: 600, h: 30, text: "Brand Strategist", fontFamily: "body", fontSize: 15, fontWeight: 600, color: p27.orange, align: "left", lineHeight: 1 },
+    { type: "icon", x: 40, y: 380, w: 22, h: 22, icon: "mail", color: p27.ink },
+    { type: "text", x: 75, y: 380, w: 400, h: 24, text: "maya@studioform.co", fontFamily: "body", fontSize: 14, fontWeight: 400, color: p27.ink, align: "left", lineHeight: 1.2 },
+    { type: "icon", x: 40, y: 416, w: 22, h: 22, icon: "globe", color: p27.ink },
+    { type: "text", x: 75, y: 416, w: 400, h: 24, text: "studioform.co", fontFamily: "body", fontSize: 14, fontWeight: 400, color: p27.ink, align: "left", lineHeight: 1.2 },
+    { type: "shape", shape: "ellipse", x: 880, y: 60, w: 100, h: 100, fill: p27.ink, radius: 0, opacity: 1 },
+  ]),
+};
+
+// ---------- Luxury Gold Card (Business Card, 1050x600) ----------
+const p28 = { black: "#0d0d0d", gold: "#c9a34f" };
+const luxuryGoldCard: TemplatePreset = {
+  id: "luxury-gold-card",
+  name: "Luxury Gold Card",
+  category: "Business Card",
+  keywords: ["business card", "luxury", "gold", "black", "elegant", "premium"],
+  doc: finalize(1050, 600, p28.black, [
+    { type: "shape", shape: "rect", x: 40, y: 40, w: 970, h: 520, fill: p28.black, radius: 0, opacity: 1, stroke: p28.gold, strokeWidth: 1.5 },
+    { type: "text", x: 0, y: 200, w: 1050, h: 50, text: "AURELIA", fontFamily: "display", fontSize: 34, fontWeight: 700, color: p28.gold, align: "center", lineHeight: 1 },
+    { type: "text", x: 0, y: 258, w: 1050, h: 24, text: "INTERIORS", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)", align: "center", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 475, y: 330, w: 100, h: 1, fill: p28.gold, radius: 0, opacity: 1 },
+    { type: "text", x: 0, y: 400, w: 1050, h: 24, text: "Devon Marlowe · Principal Designer", fontFamily: "body", fontSize: 14, fontWeight: 400, color: "#ffffff", align: "center", lineHeight: 1 },
+    { type: "text", x: 0, y: 430, w: 1050, h: 24, text: "(212) 555-0134 · aurelia-interiors.com", fontFamily: "body", fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.6)", align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Creative Portfolio Card (Business Card, 1050x600) ----------
+const p29 = { pink: "#ff5c8a", purple: "#6c3fc9", ink: "#1c1530" };
+const creativePortfolioCard: TemplatePreset = {
+  id: "creative-portfolio-card",
+  name: "Creative Portfolio Card",
+  category: "Business Card",
+  keywords: ["business card", "creative", "artist", "designer", "playful", "colorful"],
+  doc: finalize(1050, 600, "#ffffff", [
+    { type: "shape", shape: "ellipse", x: -100, y: -100, w: 320, h: 320, fill: p29.pink, radius: 0, opacity: 0.9 },
+    { type: "shape", shape: "ellipse", x: 850, y: 380, w: 300, h: 300, fill: p29.purple, radius: 0, opacity: 0.85 },
+    { type: "text", x: 60, y: 220, w: 700, h: 50, text: "Jordan Blake", fontFamily: "display", fontSize: 32, fontWeight: 700, color: p29.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 60, y: 276, w: 700, h: 30, text: "Illustrator & Motion Designer", fontFamily: "body", fontSize: 15, fontWeight: 600, color: p29.purple, align: "left", lineHeight: 1 },
+    { type: "text", x: 60, y: 420, w: 600, h: 26, text: "hello@jordanblake.art", fontFamily: "body", fontSize: 14, fontWeight: 400, color: p29.ink, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 452, w: 600, h: 26, text: "@jordanblake.art", fontFamily: "body", fontSize: 14, fontWeight: 400, color: p29.ink, align: "left", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Tech Startup Card (Business Card, 1050x600) ----------
+const p30 = { blue: "#155ef2", ink: "#101828", tint: "#eef3ff" };
+const techStartupCard: TemplatePreset = {
+  id: "tech-startup-card",
+  name: "Tech Startup Card",
+  category: "Business Card",
+  keywords: ["business card", "tech", "startup", "saas", "clean", "modern"],
+  doc: finalize(1050, 600, "#ffffff", [
+    { type: "shape", shape: "rect", x: 0, y: 0, w: 1050, h: 600, fill: p30.tint, radius: 0, opacity: 1 },
+    { type: "shape", shape: "rect", x: 40, y: 40, w: 60, h: 60, fill: p30.blue, radius: 16, opacity: 1 },
+    { type: "text", x: 118, y: 56, w: 400, h: 30, text: "Loopwork", fontFamily: "display", fontSize: 22, fontWeight: 700, color: p30.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 40, y: 260, w: 600, h: 40, text: "Priya Nair", fontFamily: "display", fontSize: 26, fontWeight: 700, color: p30.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 40, y: 306, w: 600, h: 26, text: "Head of Product", fontFamily: "body", fontSize: 14.5, fontWeight: 500, color: p30.blue, align: "left", lineHeight: 1 },
+    { type: "shape", shape: "rect", x: 40, y: 470, w: 970, h: 1.5, fill: "rgba(16,24,40,0.12)", radius: 0, opacity: 1 },
+    { type: "text", x: 40, y: 500, w: 600, h: 24, text: "priya@loopwork.io  ·  loopwork.io", fontFamily: "body", fontSize: 13.5, fontWeight: 400, color: p30.ink, align: "left", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Team Slide (Presentation, 1920x1080) ----------
+const p31 = { ink: "#151b26", mid: "#3f6d99", tint: "#eef3f9" };
+const teamSlide: TemplatePreset = {
+  id: "team-slide",
+  name: "Team Slide",
+  category: "Presentation",
+  keywords: ["slide", "team", "who we are", "staff", "people", "deck"],
+  doc: finalize(1920, 1080, "#ffffff", [
+    { type: "text", x: 140, y: 90, w: 800, h: 26, text: "WHO WE ARE", fontFamily: "body", fontSize: 15, fontWeight: 700, color: p31.mid, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 140, y: 125, w: 1000, h: 80, text: "Meet the team", fontFamily: "display", fontSize: 44, fontWeight: 700, color: p31.ink, align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "ellipse", x: 140, y: 300, w: 180, h: 180, fill: p31.tint, radius: 0, opacity: 1 },
+    { type: "text", x: 140, y: 500, w: 300, h: 28, text: "[Name]", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p31.ink, align: "center", lineHeight: 1 },
+    { type: "text", x: 140, y: 532, w: 300, h: 22, text: "Founder & CEO", fontFamily: "body", fontSize: 13.5, fontWeight: 500, color: p31.mid, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "ellipse", x: 550, y: 300, w: 180, h: 180, fill: p31.tint, radius: 0, opacity: 1 },
+    { type: "text", x: 550, y: 500, w: 300, h: 28, text: "[Name]", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p31.ink, align: "center", lineHeight: 1 },
+    { type: "text", x: 550, y: 532, w: 300, h: 22, text: "Head of Design", fontFamily: "body", fontSize: 13.5, fontWeight: 500, color: p31.mid, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "ellipse", x: 960, y: 300, w: 180, h: 180, fill: p31.tint, radius: 0, opacity: 1 },
+    { type: "text", x: 960, y: 500, w: 300, h: 28, text: "[Name]", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p31.ink, align: "center", lineHeight: 1 },
+    { type: "text", x: 960, y: 532, w: 300, h: 22, text: "Head of Engineering", fontFamily: "body", fontSize: 13.5, fontWeight: 500, color: p31.mid, align: "center", lineHeight: 1 },
+    { type: "shape", shape: "ellipse", x: 1370, y: 300, w: 180, h: 180, fill: p31.tint, radius: 0, opacity: 1 },
+    { type: "text", x: 1370, y: 500, w: 300, h: 28, text: "[Name]", fontFamily: "display", fontSize: 19, fontWeight: 700, color: p31.ink, align: "center", lineHeight: 1 },
+    { type: "text", x: 1370, y: 532, w: 300, h: 22, text: "Head of Growth", fontFamily: "body", fontSize: 13.5, fontWeight: 500, color: p31.mid, align: "center", lineHeight: 1 },
+  ]),
+};
+
+// ---------- Pricing Slide (Presentation, 1920x1080) ----------
+const p32 = { ink: "#151b26", mid: "#2f6fed", tint: "#eef3ff" };
+const pricingSlide: TemplatePreset = {
+  id: "pricing-slide",
+  name: "Pricing Slide",
+  category: "Presentation",
+  keywords: ["slide", "pricing", "plans", "tiers", "packages", "deck"],
+  doc: finalize(1920, 1080, "#ffffff", [
+    { type: "text", x: 140, y: 90, w: 800, h: 60, text: "Simple, transparent pricing", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p32.ink, align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "rect", x: 140, y: 230, w: 500, h: 700, fill: p32.tint, radius: 18, opacity: 1 },
+    { type: "text", x: 180, y: 280, w: 420, h: 30, text: "Starter", fontFamily: "display", fontSize: 20, fontWeight: 700, color: p32.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 180, y: 330, w: 420, h: 60, text: "$29/mo", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p32.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 180, y: 420, w: 420, h: 120, text: "For individuals just getting started.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 710, y: 190, w: 500, h: 780, fill: p32.mid, radius: 18, opacity: 1 },
+    { type: "text", x: 750, y: 240, w: 420, h: 30, text: "Pro", fontFamily: "display", fontSize: 20, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "text", x: 750, y: 290, w: 420, h: 60, text: "$79/mo", fontFamily: "display", fontSize: 40, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "text", x: 750, y: 380, w: 420, h: 120, text: "For growing teams that need more.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "rgba(255,255,255,0.85)", align: "left", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 1280, y: 230, w: 500, h: 700, fill: p32.tint, radius: 18, opacity: 1 },
+    { type: "text", x: 1320, y: 280, w: 420, h: 30, text: "Enterprise", fontFamily: "display", fontSize: 20, fontWeight: 700, color: p32.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 1320, y: 330, w: 420, h: 60, text: "Custom", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p32.ink, align: "left", lineHeight: 1 },
+    { type: "text", x: 1320, y: 420, w: 420, h: 120, text: "Dedicated support, custom SLAs.", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.5 },
+  ]),
+};
+
+// ---------- Roadmap Slide (Presentation, 1920x1080) ----------
+const p33 = { ink: "#151b26", mid: "#3f6d99", line: "#d7e0ea" };
+const roadmapSlide: TemplatePreset = {
+  id: "roadmap-slide",
+  name: "Roadmap Slide",
+  category: "Presentation",
+  keywords: ["slide", "roadmap", "timeline", "plan", "milestones", "deck"],
+  doc: finalize(1920, 1080, "#ffffff", [
+    { type: "text", x: 140, y: 90, w: 800, h: 60, text: "Where we're headed", fontFamily: "display", fontSize: 40, fontWeight: 700, color: p33.ink, align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "line", x: 140, y: 500, w: 1640, h: 3, fill: p33.line, radius: 0, opacity: 1 },
+    { type: "shape", shape: "ellipse", x: 216, y: 486, w: 30, h: 30, fill: p33.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 140, y: 540, w: 340, h: 26, text: "Q1", fontFamily: "display", fontSize: 16, fontWeight: 700, color: p33.mid, align: "left", lineHeight: 1 },
+    { type: "text", x: 140, y: 574, w: 340, h: 80, text: "Launch core platform to first 50 customers", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.4 },
+    { type: "shape", shape: "ellipse", x: 636, y: 486, w: 30, h: 30, fill: p33.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 560, y: 540, w: 340, h: 26, text: "Q2", fontFamily: "display", fontSize: 16, fontWeight: 700, color: p33.mid, align: "left", lineHeight: 1 },
+    { type: "text", x: 560, y: 574, w: 340, h: 80, text: "Ship integrations and mobile app", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.4 },
+    { type: "shape", shape: "ellipse", x: 1056, y: 486, w: 30, h: 30, fill: p33.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 980, y: 540, w: 340, h: 26, text: "Q3", fontFamily: "display", fontSize: 16, fontWeight: 700, color: p33.mid, align: "left", lineHeight: 1 },
+    { type: "text", x: 980, y: 574, w: 340, h: 80, text: "Expand to enterprise, SOC 2 audit", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.4 },
+    { type: "shape", shape: "ellipse", x: 1476, y: 486, w: 30, h: 30, fill: p33.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 1400, y: 540, w: 340, h: 26, text: "Q4", fontFamily: "display", fontSize: 16, fontWeight: 700, color: p33.mid, align: "left", lineHeight: 1 },
+    { type: "text", x: 1400, y: 574, w: 340, h: 80, text: "International launch", fontFamily: "body", fontSize: 16, fontWeight: 400, color: "#5c6b7a", align: "left", lineHeight: 1.4 },
+  ]),
+};
+
+// ---------- Contact Slide (Presentation, 1920x1080) ----------
+const p34 = { bg: "#151b26", mid: "#3f6d99" };
+const contactSlide: TemplatePreset = {
+  id: "contact-slide",
+  name: "Contact Slide",
+  category: "Presentation",
+  keywords: ["slide", "contact", "thank you", "closing", "get in touch", "deck"],
+  doc: finalize(1920, 1080, p34.bg, [
+    { type: "shape", shape: "ellipse", x: 1500, y: -100, w: 500, h: 500, fill: p34.mid, radius: 0, opacity: 0.16 },
+    { type: "text", x: 140, y: 380, w: 1200, h: 130, text: "Let's talk", fontFamily: "display", fontSize: 72, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "shape", shape: "line", x: 140, y: 530, w: 60, h: 3, fill: p34.mid, radius: 0, opacity: 1 },
+    { type: "text", x: 140, y: 560, w: 800, h: 30, text: "[hello@yourcompany.com]", fontFamily: "body", fontSize: 20, fontWeight: 500, color: "rgba(255,255,255,0.85)", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 140, y: 600, w: 800, h: 30, text: "[yourcompany.com]", fontFamily: "body", fontSize: 20, fontWeight: 500, color: "rgba(255,255,255,0.6)", align: "left", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Photographer Portfolio Post (Social Post, 1080x1080) ----------
+const p35 = { black: "#0a0a0a", cream: "#f2ede4" };
+const photographerPortfolio: TemplatePreset = {
+  id: "photographer-portfolio",
+  name: "Photographer Portfolio Post",
+  category: "Social Post",
+  keywords: ["photographer", "photography", "portfolio", "moody", "gallery"],
+  doc: finalize(1080, 1080, p35.black, [
+    { type: "text", x: 0, y: 70, w: 1080, h: 30, text: "[PHOTOGRAPHER NAME]", fontFamily: "body", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.6)", align: "center", lineHeight: 1.2 },
+    ...rePhotoPlaceholder(90, 130, 900, 780).map((el) => (el.type === "shape" ? { ...el, fill: "#1c1c1c", stroke: "rgba(255,255,255,0.3)" } : { ...el, color: "rgba(255,255,255,0.5)" })),
+    { type: "text", x: 0, y: 960, w: 1080, h: 30, text: "Portfolio at [website.com] · @[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.55)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Yoga & Wellness Post (Social Post, 1080x1080) ----------
+const p36 = { sage: "#5c7a63", tint: "#eef3ea", ink: "#3c4a3f" };
+const yogaWellnessPost: TemplatePreset = {
+  id: "yoga-wellness-post",
+  name: "Yoga & Wellness Class",
+  category: "Social Post",
+  keywords: ["yoga", "wellness", "meditation", "studio", "class", "calm", "mindfulness"],
+  doc: finalize(1080, 1080, p36.tint, [
+    ...bizHeader(p36.sage, "leaf", "New Session"),
+    { type: "shape", shape: "ellipse", x: 390, y: 200, w: 300, h: 300, fill: "#ffffff", radius: 0, opacity: 1 },
+    { type: "icon", x: 490, y: 300, w: 100, h: 100, icon: "leaf", color: p36.sage },
+    { type: "text", x: 90, y: 560, w: 900, h: 60, text: "Find your breath again", fontFamily: "display", fontSize: 38, fontWeight: 700, color: p36.ink, align: "center", lineHeight: 1.1 },
+    { type: "text", x: 190, y: 640, w: 700, h: 60, text: "Gentle flow · all levels welcome · mats provided", fontFamily: "body", fontSize: 15.5, fontWeight: 400, color: "#6b7d70", align: "center", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 240, y: 800, w: 600, h: 74, fill: p36.sage, radius: 37, opacity: 1 },
+    { type: "text", x: 240, y: 826, w: 600, h: 26, text: "Reserve your mat — link in bio", fontFamily: "display", fontSize: 16, fontWeight: 600, color: "#ffffff", align: "center", lineHeight: 1 },
+    ...bizFooter(p36.sage),
+  ]),
+};
+
+// ---------- Auto Detailing Promo (Social Post, 1080x1080) ----------
+const p37 = { black: "#111214", red: "#d61f26", tint: "#f2f2f2" };
+const autoDetailingPromo: TemplatePreset = {
+  id: "auto-detailing-promo",
+  name: "Auto Detailing Promo",
+  category: "Social Post",
+  keywords: ["auto detailing", "car wash", "car detailing", "automotive", "shine"],
+  doc: finalize(1080, 1080, p37.black, [
+    { type: "icon", x: 40, y: 40, w: 34, h: 34, icon: "car", color: p37.red },
+    { type: "text", x: 90, y: 46, w: 500, h: 30, text: "[Business Name]", fontFamily: "display", fontSize: 18, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 160, w: 960, h: 200, text: "Showroom Shine", fontFamily: "display", fontSize: 72, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1 },
+    { type: "text", x: 60, y: 320, w: 800, h: 40, text: "Full interior + exterior detail, done right.", fontFamily: "body", fontSize: 19, fontWeight: 400, color: "rgba(255,255,255,0.7)", align: "left", lineHeight: 1.3 },
+    { type: "shape", shape: "rect", x: 60, y: 420, w: 960, h: 400, fill: p37.tint, radius: 16, opacity: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 860, w: 960, h: 90, fill: p37.red, radius: 14, opacity: 1 },
+    { type: "text", x: 60, y: 888, w: 960, h: 34, text: "Book this week — 15% off full detail", fontFamily: "display", fontSize: 20, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    { type: "text", x: 0, y: 1000, w: 1080, h: 26, text: "[Phone] · @[Instagram handle]", fontFamily: "body", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.55)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Pet Grooming Post (Social Post, 1080x1080) ----------
+const p38 = { teal: "#1f7a72", peach: "#ffd9b3", ink: "#2e4a46" };
+const petGroomingPost: TemplatePreset = {
+  id: "pet-grooming-post",
+  name: "Pet Grooming Promo",
+  category: "Social Post",
+  keywords: ["pet grooming", "dog groomer", "pet care", "pet spa", "grooming"],
+  doc: finalize(1080, 1080, "#ffffff", [
+    ...bizHeader(p38.teal, "paw", "Book a Groom"),
+    { type: "shape", shape: "ellipse", x: 340, y: 140, w: 400, h: 400, fill: p38.peach, radius: 0, opacity: 1 },
+    { type: "icon", x: 490, y: 290, w: 100, h: 100, icon: "paw", color: p38.teal },
+    { type: "text", x: 90, y: 580, w: 900, h: 60, text: "Fresh cut, happy pup", fontFamily: "display", fontSize: 38, fontWeight: 700, color: p38.ink, align: "center", lineHeight: 1.1 },
+    { type: "text", x: 190, y: 660, w: 700, h: 50, text: "Bath, trim, nails & ears — all in one visit.", fontFamily: "body", fontSize: 15.5, fontWeight: 400, color: "#5c7370", align: "center", lineHeight: 1.4 },
+    { type: "shape", shape: "rect", x: 240, y: 800, w: 600, h: 74, fill: p38.teal, radius: 37, opacity: 1 },
+    { type: "text", x: 240, y: 826, w: 600, h: 26, text: "Book your pup's appointment today", fontFamily: "display", fontSize: 15.5, fontWeight: 600, color: "#ffffff", align: "center", lineHeight: 1 },
+    ...bizFooter(p38.teal),
+  ]),
+};
+
+// ---------- Garage Sale Flyer (Flyer, 1080x1350) ----------
+const p39 = { yellow: "#f4c430", ink: "#1c1508", brown: "#5a3e1b" };
+const garageSaleFlyer: TemplatePreset = {
+  id: "garage-sale-flyer",
+  name: "Garage Sale Flyer",
+  category: "Flyer",
+  keywords: ["garage sale", "yard sale", "community", "moving sale", "estate sale"],
+  doc: finalize(1080, 1350, p39.yellow, [
+    { type: "text", x: 60, y: 100, w: 960, h: 160, text: "HUGE GARAGE SALE", fontFamily: "display", fontSize: 58, fontWeight: 700, color: p39.ink, align: "center", lineHeight: 1.1 },
+    { type: "shape", shape: "line", x: 390, y: 280, w: 300, h: 4, fill: p39.ink, radius: 0, opacity: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 340, w: 960, h: 560, fill: "#ffffff", radius: 16, opacity: 1, stroke: p39.ink, strokeWidth: 2 },
+    { type: "text", x: 60, y: 940, w: 960, h: 34, text: "Saturday, Sept 13 · 8 AM – 2 PM", fontFamily: "display", fontSize: 24, fontWeight: 700, color: p39.brown, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 990, w: 960, h: 30, text: "412 Willow Creek Rd — rain or shine", fontFamily: "body", fontSize: 17, fontWeight: 500, color: p39.ink, align: "center", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 0, y: 1180, w: 1080, h: 170, fill: p39.ink, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 1220, w: 960, h: 34, text: "Furniture · Toys · Tools · Clothes · and more", fontFamily: "display", fontSize: 20, fontWeight: 600, color: p39.yellow, align: "center", lineHeight: 1.3 },
+    { type: "text", x: 60, y: 1270, w: 960, h: 26, text: "Everything must go!", fontFamily: "body", fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.8)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Concert / Music Event Flyer (Flyer, 1080x1350) ----------
+const p40 = { black: "#0a0a0f", violet: "#8b5cf6", cyan: "#3fd9d9" };
+const concertFlyer: TemplatePreset = {
+  id: "concert-event-flyer",
+  name: "Concert Event Flyer",
+  category: "Flyer",
+  keywords: ["concert", "music", "event", "live show", "gig", "festival", "party"],
+  doc: finalize(1080, 1350, p40.black, [
+    { type: "shape", shape: "ellipse", x: -200, y: -200, w: 600, h: 600, fill: p40.violet, radius: 0, opacity: 0.25 },
+    { type: "shape", shape: "ellipse", x: 700, y: 900, w: 560, h: 560, fill: p40.cyan, radius: 0, opacity: 0.18 },
+    { type: "icon", x: 60, y: 90, w: 32, h: 32, icon: "music", color: p40.cyan },
+    { type: "text", x: 110, y: 96, w: 500, h: 30, text: "LIVE AT THE VENUE", fontFamily: "body", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 200, w: 960, h: 260, text: "Night Pulse Tour", fontFamily: "display", fontSize: 68, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.08 },
+    { type: "text", x: 60, y: 460, w: 800, h: 40, text: "with special guests THE LOW END", fontFamily: "body", fontSize: 19, fontWeight: 400, color: p40.cyan, align: "left", lineHeight: 1.3 },
+    { type: "shape", shape: "rect", x: 60, y: 560, w: 960, h: 480, fill: "rgba(255,255,255,0.05)", radius: 16, opacity: 1, stroke: "rgba(255,255,255,0.15)", strokeWidth: 1 },
+    { type: "shape", shape: "rect", x: 60, y: 1080, w: 960, h: 100, fill: p40.violet, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 1108, w: 960, h: 40, text: "Sat, Oct 24 · Doors 7PM · Tickets $25", fontFamily: "display", fontSize: 20, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    { type: "text", x: 0, y: 1230, w: 1080, h: 26, text: "Tickets at [website.com/tickets]", fontFamily: "body", fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Kids Event Flyer (Flyer, 1080x1350) ----------
+const p41 = { blue: "#2f8fd6", yellow: "#ffcb3d", coral: "#ff7a5c", cream: "#fff8ec" };
+const kidsEventFlyer: TemplatePreset = {
+  id: "kids-event-flyer",
+  name: "Kids Event Flyer",
+  category: "Flyer",
+  keywords: ["kids event", "family", "school", "carnival", "story time", "children"],
+  doc: finalize(1080, 1350, p41.cream, [
+    { type: "shape", shape: "ellipse", x: 60, y: 80, w: 120, h: 120, fill: p41.yellow, radius: 0, opacity: 1 },
+    { type: "shape", shape: "ellipse", x: 900, y: 140, w: 90, h: 90, fill: p41.coral, radius: 0, opacity: 1 },
+    { type: "shape", shape: "ellipse", x: 820, y: 40, w: 60, h: 60, fill: p41.blue, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 240, w: 960, h: 160, text: "Family Fun Day!", fontFamily: "display", fontSize: 60, fontWeight: 700, color: p41.blue, align: "center", lineHeight: 1.1 },
+    { type: "text", x: 140, y: 400, w: 800, h: 60, text: "Games, face painting, and a petting zoo — free for the whole family.", fontFamily: "body", fontSize: 18, fontWeight: 500, color: "#5c4a3a", align: "center", lineHeight: 1.5 },
+    { type: "shape", shape: "rect", x: 90, y: 520, w: 900, h: 500, fill: "#ffffff", radius: 24, opacity: 1, stroke: p41.blue, strokeWidth: 3 },
+    { type: "shape", shape: "rect", x: 0, y: 1120, w: 1080, h: 130, fill: p41.coral, radius: 0, opacity: 1 },
+    { type: "text", x: 60, y: 1155, w: 960, h: 34, text: "Saturday, Oct 4 · 10 AM – 2 PM", fontFamily: "display", fontSize: 22, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 1200, w: 960, h: 26, text: "Lincoln Elementary Playground", fontFamily: "body", fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.85)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
+// ---------- Holiday Sale Flyer (Flyer, 1080x1350) ----------
+const p42 = { green: "#123f2c", red: "#b5232f", cream: "#f7efdf", gold: "#d9a441" };
+const holidaySaleFlyer: TemplatePreset = {
+  id: "holiday-sale-flyer",
+  name: "Holiday Sale Flyer",
+  category: "Flyer",
+  keywords: ["holiday", "christmas", "seasonal sale", "winter sale", "gift", "festive"],
+  doc: finalize(1080, 1350, p42.green, [
+    { type: "icon", x: 60, y: 80, w: 30, h: 30, icon: "gift", color: p42.gold },
+    { type: "text", x: 110, y: 86, w: 500, h: 28, text: "[Business Name]", fontFamily: "display", fontSize: 17, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 180, w: 960, h: 40, text: "HOLIDAY SALE", fontFamily: "body", fontSize: 18, fontWeight: 700, color: p42.gold, align: "left", lineHeight: 1.2 },
+    { type: "text", x: 60, y: 230, w: 960, h: 200, text: "Season's Savings", fontFamily: "display", fontSize: 64, fontWeight: 700, color: "#ffffff", align: "left", lineHeight: 1.1 },
+    { type: "shape", shape: "rect", x: 60, y: 460, w: 960, h: 130, fill: p42.red, radius: 16, opacity: 1 },
+    { type: "text", x: 60, y: 496, w: 960, h: 60, text: "Up to 30% off storewide", fontFamily: "display", fontSize: 30, fontWeight: 700, color: "#ffffff", align: "center", lineHeight: 1.2 },
+    { type: "shape", shape: "rect", x: 60, y: 630, w: 960, h: 460, fill: p42.cream, radius: 16, opacity: 1 },
+    { type: "text", x: 60, y: 1140, w: 960, h: 34, text: "Now through Dec 31", fontFamily: "display", fontSize: 22, fontWeight: 700, color: p42.gold, align: "center", lineHeight: 1.2 },
+    { type: "text", x: 0, y: 1230, w: 1080, h: 30, text: "[website.com] · @[Instagram handle]", fontFamily: "body", fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.65)", align: "center", lineHeight: 1.2 },
+  ]),
+};
+
 export const templatePresets: TemplatePreset[] = [
   localTipPubmat,
   justListed,
@@ -865,6 +1247,26 @@ export const templatePresets: TemplatePreset[] = [
   podcastEpisode,
   webinarRegistration,
   celebrationSale,
+  emblemLogo,
+  geometricMark,
+  scriptWordmark,
+  stackedIconLogo,
+  boldColorBlockCard,
+  luxuryGoldCard,
+  creativePortfolioCard,
+  techStartupCard,
+  teamSlide,
+  pricingSlide,
+  roadmapSlide,
+  contactSlide,
+  photographerPortfolio,
+  yogaWellnessPost,
+  autoDetailingPromo,
+  petGroomingPost,
+  garageSaleFlyer,
+  concertFlyer,
+  kidsEventFlyer,
+  holidaySaleFlyer,
 ];
 
 export const templateCategories: TemplateCategory[] = ["Logo", "Social Post", "Flyer", "Business Card", "Presentation"];

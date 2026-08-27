@@ -27,6 +27,11 @@ export const gIcons = {
   trendDown: "M12 5v14M19 12l-7 7-7-7",
   xmark: "M18 6 6 18M6 6l12 12",
   camera: "M4 8h3l2-2h6l2 2h3v11H4V8Z M8.5 14a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0",
+  heart: "M12 20s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 5c-2.5 4.5-9.5 9-9.5 9Z",
+  paw: "M12 13a4 4 0 1 0 0.01 0 M6.5 9a1.8 1.8 0 1 0 0.01 0 M9.5 6a1.8 1.8 0 1 0 0.01 0 M14.5 6a1.8 1.8 0 1 0 0.01 0 M17.5 9a1.8 1.8 0 1 0 0.01 0",
+  car: "M5 11l1.5-4h11L19 11 M3 11h18v6H3Z M7 17v2M17 17v2 M6.5 14h.01M17.5 14h.01",
+  music: "M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 1 1 6 0Z M21 16a3 3 0 1 1-6 0 3 3 0 1 1 6 0Z",
+  gift: "M3 8h18v4H3Z M5 12h14v9H5Z M12 8v13 M8 8c-2-4 4-6 4 0 M16 8c2-4-4-6-4 0",
 } as const;
 
 export type GIconName = keyof typeof gIcons;
