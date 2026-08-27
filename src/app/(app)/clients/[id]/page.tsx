@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { sendPortalAccessAction } from "./actions";
+import { isMailConfigured } from "@/lib/mailer";
+import { isStripeConfigured } from "@/lib/stripe";
+import { CopyLinkBox } from "@/components/CopyLinkBox";
 import shell from "@/components/AppShell.module.css";
 import ui from "@/components/ui.module.css";
 
@@ -26,10 +29,11 @@ export default async function ClientDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ portalEmail?: string }>;
+  searchParams: Promise<{ portalEmail?: string; link?: string }>;
 }) {
   const { id } = await params;
-  const { portalEmail } = await searchParams;
+  const { portalEmail, link } = await searchParams;
+  const testMode = !isMailConfigured() || !isStripeConfigured();
 
   const client = await prisma.client.findUnique({
     where: { id },
@@ -53,6 +57,16 @@ export default async function ClientDetailPage({
           View client portal ↗
         </Link>
       </div>
+
+      {testMode && (
+        <div className={ui.panel} style={{ borderColor: "var(--accent)", marginBottom: 20 }}>
+          <div className={ui.pt} style={{ marginBottom: 6 }}>Testing before you go live</div>
+          <p className={ui.meta} style={{ lineHeight: 1.6 }}>
+            {!isMailConfigured() && "Email isn't connected yet, so \"Send portal access\" below hands you the real link to copy and share yourself — text it, Slack it, whatever works — so a real client can try the account, messaging, and design feedback right now. "}
+            {!isStripeConfigured() && "Payments aren't connected yet, so the client portal shows a clearly-labeled \"test mode\" pay button that marks an invoice paid without moving any real money — good enough to test the flow, no Stripe account needed until you're ready to actually charge people."}
+          </p>
+        </div>
+      )}
 
       <div className={`${ui.statsThree} staggerChildren`}>
         <div className={ui.stat}>
@@ -130,9 +144,7 @@ export default async function ClientDetailPage({
             <p className={ui.meta} style={{ lineHeight: 1.6 }}>
               Share this link with {client.contactName.split(" ")[0]} — no login required, it&apos;s unique to {client.name}.
             </p>
-            <div className={ui.meta} style={{ wordBreak: "break-all", background: "var(--tag-bg)", padding: 10, borderRadius: 4, marginTop: 8 }}>
-              /p/{client.portalToken}
-            </div>
+            <CopyLinkBox value={`/p/${client.portalToken}`} />
 
             <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
               <div className={ui.pt} style={{ marginBottom: 6 }}>Client login</div>
@@ -144,10 +156,13 @@ export default async function ClientDetailPage({
               {portalEmail === "sent" && (
                 <p className={ui.meta} style={{ color: "var(--ok)", marginBottom: 10 }}>Email sent.</p>
               )}
-              {portalEmail === "skipped" && (
-                <p className={ui.meta} style={{ color: "var(--warn)", marginBottom: 10 }}>
-                  No email provider configured — the link was logged to the server console instead. Add RESEND_API_KEY to send real emails.
-                </p>
+              {portalEmail === "skipped" && link && (
+                <div style={{ marginBottom: 10 }}>
+                  <p className={ui.meta} style={{ color: "var(--warn)" }}>
+                    No email provider connected yet — here&apos;s the real link to send yourself:
+                  </p>
+                  <CopyLinkBox value={link} />
+                </div>
               )}
               <form action={sendPortalAccessAction}>
                 <input type="hidden" name="clientId" value={client.id} />

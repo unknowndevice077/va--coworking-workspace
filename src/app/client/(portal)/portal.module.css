@@ -218,6 +218,26 @@
 .payBtn:hover {
   box-shadow: 0 4px 14px -4px color-mix(in oklch, var(--accent-fill) 55%, transparent);
 }
+.payBtnTest {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--warn);
+  background: var(--warn-soft);
+  border: 1px dashed var(--warn);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.payBtnTest:hover {
+  opacity: 0.85;
+}
+.testNote {
+  font-size: 10.5px;
+  color: var(--sub);
+  text-align: right;
+  margin-top: -2px;
+}
 
 /* Messages / comment threads — shared by /client/inbox and /client/designs/[id] */
 .msgs {

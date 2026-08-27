@@ -7,7 +7,7 @@ import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
 import { IconFile } from "@/components/icons";
 import { isStripeConfigured } from "@/lib/stripe";
-import { createCheckoutSessionAction } from "./invoices/actions";
+import { createCheckoutSessionAction, simulateInvoicePaymentAction } from "./invoices/actions";
 import styles from "./portal.module.css";
 
 function money(cents: number) {
@@ -112,16 +112,32 @@ export default async function ClientDashboardPage() {
             </div>
           ))}
           {nextInvoice && (
-            <div className={styles.invrow}>
-              <span className={styles.invlbl}>Next invoice</span>
-              <span className={styles.invval}>{money(nextInvoice.amountCents)}{nextInvoice.dueLabel ? ` · ${nextInvoice.dueLabel}` : ""}</span>
-              {isStripeConfigured() && (
-                <form action={createCheckoutSessionAction}>
-                  <input type="hidden" name="invoiceId" value={nextInvoice.id} />
-                  <button className={styles.payBtn} type="submit">Pay now</button>
-                </form>
+            <>
+              <div className={styles.invrow}>
+                <span className={styles.invlbl}>Next invoice</span>
+                <span className={styles.invval}>{money(nextInvoice.amountCents)}{nextInvoice.dueLabel ? ` · ${nextInvoice.dueLabel}` : ""}</span>
+                {isStripeConfigured() ? (
+                  <form action={createCheckoutSessionAction}>
+                    <input type="hidden" name="invoiceId" value={nextInvoice.id} />
+                    <button className={styles.payBtn} type="submit">Pay now</button>
+                  </form>
+                ) : (
+                  <form action={simulateInvoicePaymentAction}>
+                    <input type="hidden" name="invoiceId" value={nextInvoice.id} />
+                    <button
+                      className={styles.payBtnTest}
+                      type="submit"
+                      title="No payment provider connected yet — this marks the invoice paid for testing, no real charge."
+                    >
+                      Mark paid (test mode)
+                    </button>
+                  </form>
+                )}
+              </div>
+              {!isStripeConfigured() && (
+                <div className={styles.testNote}>Payments aren&apos;t live yet — this button doesn&apos;t move real money.</div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
