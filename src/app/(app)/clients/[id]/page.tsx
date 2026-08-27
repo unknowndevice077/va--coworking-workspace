@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { sendPortalAccessAction } from "./actions";
 import shell from "@/components/AppShell.module.css";
 import ui from "@/components/ui.module.css";
 
@@ -20,8 +21,15 @@ function badgeClass(status: string) {
   return `${ui.badge} ${map[status] ?? ""}`;
 }
 
-export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ClientDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ portalEmail?: string }>;
+}) {
   const { id } = await params;
+  const { portalEmail } = await searchParams;
 
   const client = await prisma.client.findUnique({
     where: { id },
@@ -124,6 +132,29 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             </p>
             <div className={ui.meta} style={{ wordBreak: "break-all", background: "var(--tag-bg)", padding: 10, borderRadius: 4, marginTop: 8 }}>
               /p/{client.portalToken}
+            </div>
+
+            <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+              <div className={ui.pt} style={{ marginBottom: 6 }}>Client login</div>
+              <p className={ui.meta} style={{ lineHeight: 1.6, marginBottom: 10 }}>
+                {client.passwordHash
+                  ? `${client.contactName.split(" ")[0]}'s account is set up — messaging, design feedback, and invoice payments are all available at /client/login.`
+                  : `Send ${client.contactName.split(" ")[0]} a setup link so they can create a password and unlock messaging, design feedback, and invoice payments.`}
+              </p>
+              {portalEmail === "sent" && (
+                <p className={ui.meta} style={{ color: "var(--ok)", marginBottom: 10 }}>Email sent.</p>
+              )}
+              {portalEmail === "skipped" && (
+                <p className={ui.meta} style={{ color: "var(--warn)", marginBottom: 10 }}>
+                  No email provider configured — the link was logged to the server console instead. Add RESEND_API_KEY to send real emails.
+                </p>
+              )}
+              <form action={sendPortalAccessAction}>
+                <input type="hidden" name="clientId" value={client.id} />
+                <button className={shell.btnGhost} type="submit">
+                  {client.passwordHash ? "Resend login link" : "Send portal access"}
+                </button>
+              </form>
             </div>
           </div>
         </div>

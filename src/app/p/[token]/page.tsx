@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DocSurface } from "@/lib/canvas-doc/render";
@@ -43,7 +44,12 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
             <div className={styles.poweredby}>CLIENT PORTAL · POWERED BY VA HUB</div>
           </div>
         </div>
-        <div style={{ fontSize: 12.5, fontWeight: 600 }}>{client.contactName}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Link href="/client/login" style={{ fontSize: 11.5, fontWeight: 600, color: "var(--accent)" }}>
+            Sign in for messaging &amp; payments →
+          </Link>
+          <div style={{ fontSize: 12.5, fontWeight: 600 }}>{client.contactName}</div>
+        </div>
       </div>
 
       <div className={`${styles.main} animIn`}>

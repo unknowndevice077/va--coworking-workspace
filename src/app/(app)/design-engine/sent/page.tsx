@@ -20,7 +20,7 @@ const STATUS_STYLE: Record<string, CSSProperties> = {
 // have actually seen and how they responded.
 export default async function FinishedDesignsPage() {
   const approvals = await prisma.designApproval.findMany({
-    include: { client: true, design: true },
+    include: { client: true, design: true, comments: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -58,11 +58,16 @@ export default async function FinishedDesignsPage() {
                       {a.status.replace("_", " ").toLowerCase()}
                     </span>
                   </div>
-                  {a.designId && (
-                    <Link href={`/design-engine/studio/${a.designId}`} className={styles.use} style={{ display: "inline-block", marginTop: 8 }}>
-                      Reopen design →
+                  <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
+                    {a.designId && (
+                      <Link href={`/design-engine/studio/${a.designId}`} className={styles.use}>
+                        Reopen design →
+                      </Link>
+                    )}
+                    <Link href={`/design-engine/sent/${a.id}`} className={styles.commentCount}>
+                      {a.comments.length > 0 ? `${a.comments.length} comment${a.comments.length > 1 ? "s" : ""} →` : "Reply →"}
                     </Link>
-                  )}
+                  </div>
                 </div>
               </div>
             );

@@ -29,6 +29,16 @@ model Client {
   portalToken  String   @unique @default(cuid())
   createdAt    DateTime @default(now())
 
+  // Real client login, layered on top of the token-link portal above
+  // without touching it: `passwordHash` is null until the client sets up
+  // their account via a one-time `setupToken` (see /client/setup/[token]),
+  // at which point they get a proper session (src/lib/client-auth.ts) and
+  // /p/[token] keeps working unauthenticated exactly as it always has.
+  passwordHash        String?
+  setupToken          String?   @unique
+  setupTokenExpiresAt DateTime?
+  accountCreatedAt    DateTime?
+
   projects        Project[]
   invoices        Invoice[]
   events          CalendarEvent[]
@@ -69,6 +79,14 @@ model Invoice {
   status      String    @default("DRAFT")
   dueLabel    String?
   createdAt   DateTime  @default(now())
+
+  // Set once a client pays via Stripe Checkout (src/lib/stripe.ts, the
+  // /api/webhooks/stripe route handler) — status still just flips to the
+  // same "PAID" string markPaidAction already writes, so nothing else has
+  // to branch on "was this paid manually or via Stripe."
+  stripeCheckoutSessionId String?
+  stripePaymentIntentId   String?
+  paidAt                  DateTime?
 }
 
 model CalendarEvent {
@@ -84,7 +102,7 @@ model CalendarEvent {
 
 model MessageThread {
   id        String    @id @default(cuid())
-  clientId  String
+  clientId  String    @unique
   client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
   updatedAt DateTime  @updatedAt
   messages  Message[]
@@ -140,6 +158,22 @@ model DesignApproval {
   status     String   @default("PENDING")
   promptText String
   createdAt  DateTime @default(now())
+
+  comments DesignComment[]
+}
+
+// Free-text back-and-forth on a sent design, alongside its Approve/Request
+// changes status — same fromVA shape as Message, so a client can say *why*
+// they requested changes, not just flip a status. Only reachable from the
+// authenticated /client area (src/lib/client-auth.ts); the legacy
+// unauthenticated /p/[token] link keeps its original approve-only actions.
+model DesignComment {
+  id         String         @id @default(cuid())
+  approvalId String
+  approval   DesignApproval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+  fromVA     Boolean        @default(false)
+  body       String
+  createdAt  DateTime       @default(now())
 }
 
 // A VA's private video project — a sequence of clips (video or image) on
