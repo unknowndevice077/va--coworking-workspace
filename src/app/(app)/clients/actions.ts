@@ -22,6 +22,7 @@ export async function createClientAction(_prevState: { error?: string } | undefi
 
   const client = await prisma.client.create({
     data: {
+      workspaceId: user.workspaceId,
       name,
       contactName: contactName || "—",
       contactEmail,
@@ -38,7 +39,7 @@ export async function createClientAction(_prevState: { error?: string } | undefi
 export async function updateClientStatusAction(clientId: string, status: string) {
   const user = await getCurrentUser();
   if (!user) return;
-  await prisma.client.update({ where: { id: clientId }, data: { status } });
+  await prisma.client.updateMany({ where: { id: clientId, workspaceId: user.workspaceId }, data: { status } });
   revalidatePath("/clients");
   revalidatePath(`/clients/${clientId}`);
 }

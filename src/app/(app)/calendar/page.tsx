@@ -1,5 +1,7 @@
 import { Fragment } from "react";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { IconPlus } from "@/components/icons";
 import shell from "@/components/AppShell.module.css";
 import styles from "./calendar.module.css";
@@ -24,7 +26,9 @@ function timeRangeLabel(start: number, end: number) {
 }
 
 export default async function CalendarPage() {
-  const events = await prisma.calendarEvent.findMany({ include: { client: true } });
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const events = await prisma.calendarEvent.findMany({ where: { workspaceId: user.workspaceId }, include: { client: true } });
 
   return (
     <div>

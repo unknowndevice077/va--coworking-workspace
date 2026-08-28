@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { DocSurface } from "@/lib/canvas-doc/render";
 import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
@@ -17,11 +18,14 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function DesignFeedbackPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const approval = await prisma.designApproval.findUnique({
     where: { id },
     include: { client: true, design: true, comments: { orderBy: { createdAt: "asc" } } },
   });
-  if (!approval) notFound();
+  if (!approval || approval.workspaceId !== user.workspaceId) notFound();
 
   const doc = normalizeDoc(approval.doc);
   if (!doc) notFound();

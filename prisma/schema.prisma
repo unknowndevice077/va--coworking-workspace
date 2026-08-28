@@ -8,8 +8,38 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// One VA's business — everything else in this schema is scoped to a
+// Workspace via a `workspaceId` column, set once at signup
+// (src/app/signup/actions.ts) and never changed. A brand-new signup gets a
+// brand-new, empty Workspace; nothing is shared across workspaces. Every
+// list/detail query under src/app/(app)/* filters by
+// getCurrentUser().workspaceId, and every create sets it from the same
+// place — that single convention is what keeps one VA's clients, designs,
+// invoices, etc. invisible to every other VA's workspace.
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users          User[]
+  clients        Client[]
+  projects       Project[]
+  timeEntries    TimeEntry[]
+  invoices       Invoice[]
+  events         CalendarEvent[]
+  threads        MessageThread[]
+  messages       Message[]
+  files          ClientFile[]
+  designs        Design[]
+  approvals      DesignApproval[]
+  comments       DesignComment[]
+  videoProjects  VideoProject[]
+}
+
 model User {
   id           String      @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   name         String
   email        String      @unique
   passwordHash String
@@ -20,6 +50,8 @@ model User {
 
 model Client {
   id           String   @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   name         String
   contactName  String
   contactEmail String
@@ -39,6 +71,11 @@ model Client {
   setupTokenExpiresAt DateTime?
   accountCreatedAt    DateTime?
 
+  // Set on a client seeded for the public /demo sandbox (src/lib/demo.ts) —
+  // the auto-responder bot only ever acts on clients with this set, so it
+  // can never touch a real VA's real client by accident.
+  isDemo Boolean @default(false)
+
   projects        Project[]
   invoices        Invoice[]
   events          CalendarEvent[]
@@ -48,31 +85,37 @@ model Client {
 }
 
 model Project {
-  id        String    @id @default(cuid())
-  clientId  String
-  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  title     String
-  status    String    @default("TODO")
-  dueLabel  String?
-  createdAt DateTime  @default(now())
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title       String
+  status      String    @default("TODO")
+  dueLabel    String?
+  createdAt   DateTime  @default(now())
 
   timeEntries TimeEntry[]
 }
 
 model TimeEntry {
-  id        String   @id @default(cuid())
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  minutes   Int
-  date      DateTime @default(now())
-  note      String?
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  minutes     Int
+  date        DateTime  @default(now())
+  note        String?
 }
 
 model Invoice {
   id          String    @id @default(cuid())
-  number      String    @unique
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  number      String
   clientId    String
   client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
   amountCents Int
@@ -87,43 +130,53 @@ model Invoice {
   stripeCheckoutSessionId String?
   stripePaymentIntentId   String?
   paidAt                  DateTime?
+
+  @@unique([workspaceId, number])
 }
 
 model CalendarEvent {
-  id       String   @id @default(cuid())
-  clientId String?
-  client   Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  title    String
-  day      String
-  startHour Float
-  endHour   Float
-  allDay    Boolean @default(false)
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String?
+  client      Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  title       String
+  day         String
+  startHour   Float
+  endHour     Float
+  allDay      Boolean   @default(false)
 }
 
 model MessageThread {
-  id        String    @id @default(cuid())
-  clientId  String    @unique
-  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  updatedAt DateTime  @updatedAt
-  messages  Message[]
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String    @unique
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime  @updatedAt
+  messages    Message[]
 }
 
 model Message {
-  id        String        @id @default(cuid())
-  threadId  String
-  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  fromVA    Boolean       @default(false)
-  body      String
-  createdAt DateTime      @default(now())
+  id          String        @id @default(cuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  threadId    String
+  thread      MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  fromVA      Boolean       @default(false)
+  body        String
+  createdAt   DateTime      @default(now())
 }
 
 model ClientFile {
-  id        String   @id @default(cuid())
-  clientId  String
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  filename  String
-  sizeLabel String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  filename    String
+  sizeLabel   String
+  createdAt   DateTime  @default(now())
 }
 
 // A VA's private, in-progress design — a free-form Canva-like canvas. Never
@@ -135,29 +188,33 @@ model ClientFile {
 // state. `templateId` (when a design started from a preset) is just a
 // label for display; presets live in code, not the database.
 model Design {
-  id         String   @id @default(cuid())
-  templateId String?
-  name       String
-  doc        Json
-  promptText String   @default("")
-  status     String   @default("DRAFT") // DRAFT | SENT
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  templateId  String?
+  name        String
+  doc         Json
+  promptText  String    @default("")
+  status      String    @default("DRAFT") // DRAFT | SENT
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   approvals DesignApproval[]
 }
 
 model DesignApproval {
-  id         String   @id @default(cuid())
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  templateId String?
-  designId   String?
-  design     Design?  @relation(fields: [designId], references: [id], onDelete: SetNull)
-  doc        Json
-  status     String   @default("PENDING")
-  promptText String
-  createdAt  DateTime @default(now())
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  templateId  String?
+  designId    String?
+  design      Design?   @relation(fields: [designId], references: [id], onDelete: SetNull)
+  doc         Json
+  status      String    @default("PENDING")
+  promptText  String
+  createdAt   DateTime  @default(now())
 
   comments DesignComment[]
 }
@@ -168,12 +225,14 @@ model DesignApproval {
 // authenticated /client area (src/lib/client-auth.ts); the legacy
 // unauthenticated /p/[token] link keeps its original approve-only actions.
 model DesignComment {
-  id         String         @id @default(cuid())
-  approvalId String
-  approval   DesignApproval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
-  fromVA     Boolean        @default(false)
-  body       String
-  createdAt  DateTime       @default(now())
+  id          String         @id @default(cuid())
+  workspaceId String
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  approvalId  String
+  approval    DesignApproval @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+  fromVA      Boolean        @default(false)
+  body        String
+  createdAt   DateTime       @default(now())
 }
 
 // A VA's private video project — a sequence of clips (video or image) on
@@ -183,9 +242,11 @@ model DesignComment {
 // Design's `doc` — simplest thing that works at this project's scale, no
 // object storage to wire up.
 model VideoProject {
-  id        String   @id @default(cuid())
-  name      String
-  doc       Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  doc         Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

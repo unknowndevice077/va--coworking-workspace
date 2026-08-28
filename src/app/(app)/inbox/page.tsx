@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { sendMessageAction } from "./actions";
 import styles from "./inbox.module.css";
 
@@ -20,19 +22,23 @@ export default async function InboxPage({
   searchParams: Promise<{ thread?: string }>;
 }) {
   const { thread: threadParam } = await searchParams;
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
 
   const threads = await prisma.messageThread.findMany({
+    where: { workspaceId: user.workspaceId },
     include: { client: true, messages: { orderBy: { createdAt: "desc" }, take: 1 } },
     orderBy: { updatedAt: "desc" },
   });
 
   const activeId = threadParam ?? threads[0]?.id;
-  const active = activeId
+  const activeCandidate = activeId
     ? await prisma.messageThread.findUnique({
         where: { id: activeId },
         include: { client: true, messages: { orderBy: { createdAt: "asc" } } },
       })
     : null;
+  const active = activeCandidate?.workspaceId === user.workspaceId ? activeCandidate : null;
 
   return (
     <div className={styles.shell2}>

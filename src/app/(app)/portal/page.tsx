@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import shell from "@/components/AppShell.module.css";
 import ui from "@/components/ui.module.css";
 
@@ -8,7 +10,11 @@ function initialsOf(name: string) {
 }
 
 export default async function PortalIndexPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const clients = await prisma.client.findMany({
+    where: { workspaceId: user.workspaceId },
     orderBy: { name: "asc" },
     include: { designApprovals: { where: { status: "PENDING" } } },
   });

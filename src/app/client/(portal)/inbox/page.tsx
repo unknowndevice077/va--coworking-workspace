@@ -10,7 +10,7 @@ export default async function ClientInboxPage() {
 
   const thread = await prisma.messageThread.upsert({
     where: { clientId: session.id },
-    create: { clientId: session.id },
+    create: { workspaceId: session.workspaceId, clientId: session.id },
     update: {},
     include: { messages: { orderBy: { createdAt: "asc" } } },
   });

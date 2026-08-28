@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentClient } from "@/lib/client-auth";
+import { botReplyToMessage } from "@/lib/demo-bot";
 
 export async function sendClientMessageAction(formData: FormData) {
   const client = await getCurrentClient();
@@ -18,7 +19,12 @@ export async function sendClientMessageAction(formData: FormData) {
     throw new Error("Not found");
   }
 
-  await prisma.message.create({ data: { threadId, body, fromVA: false } });
+  await prisma.message.create({ data: { workspaceId: thread.workspaceId, threadId, body, fromVA: false } });
   await prisma.messageThread.update({ where: { id: threadId }, data: { updatedAt: new Date() } });
+
+  if (client.isDemo) {
+    await botReplyToMessage({ workspaceId: thread.workspaceId, threadId, clientId: client.id, incomingBody: body });
+  }
+
   revalidatePath("/client/inbox");
 }

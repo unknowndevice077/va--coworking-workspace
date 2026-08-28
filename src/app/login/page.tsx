@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { loginAction } from "./actions";
 import { Logo } from "@/components/Logo";
 import styles from "./login.module.css";
@@ -32,6 +33,12 @@ export default function LoginPage() {
           </button>
         </form>
         <p className={styles.hint}>Demo account is pre-filled — just hit sign in.</p>
+        <p className={styles.hint}>
+          New here? <Link href="/signup">Create your own workspace →</Link>
+        </p>
+        <p className={styles.hint}>
+          Curious what a client sees? <Link href="/demo">Try the live client demo →</Link>
+        </p>
       </div>
     </div>
   );

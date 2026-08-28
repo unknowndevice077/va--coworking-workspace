@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { markPaidAction } from "./actions";
 import { IconPlus } from "@/components/icons";
 import shell from "@/components/AppShell.module.css";
@@ -19,7 +21,11 @@ function badgeClass(status: string) {
 }
 
 export default async function InvoicesPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const invoices = await prisma.invoice.findMany({
+    where: { workspaceId: user.workspaceId },
     include: { client: true },
     orderBy: { number: "desc" },
   });

@@ -16,7 +16,7 @@ export async function sendPortalAccessAction(formData: FormData) {
 
   const clientId = String(formData.get("clientId") ?? "");
   const client = await prisma.client.findUnique({ where: { id: clientId } });
-  if (!client) redirect("/clients");
+  if (!client || client.workspaceId !== user.workspaceId) redirect("/clients");
 
   let outcome: "sent" | "skipped";
   let link: string;

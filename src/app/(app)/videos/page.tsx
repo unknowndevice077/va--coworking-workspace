@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { normalizeVideoDoc, totalDuration } from "@/lib/video-doc/types";
 import { createVideoProjectAction } from "./actions";
 import { IconPlus } from "@/components/icons";
@@ -12,7 +14,9 @@ function fmtDuration(seconds: number) {
 }
 
 export default async function VideosPage() {
-  const projects = await prisma.videoProject.findMany({ orderBy: { updatedAt: "desc" } });
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const projects = await prisma.videoProject.findMany({ where: { workspaceId: user.workspaceId }, orderBy: { updatedAt: "desc" } });
 
   return (
     <div>

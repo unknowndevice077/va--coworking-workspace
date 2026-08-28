@@ -14,7 +14,7 @@ export async function moveProjectAction(formData: FormData) {
   const direction = String(formData.get("direction"));
 
   const project = await prisma.project.findUnique({ where: { id: projectId } });
-  if (!project) return;
+  if (!project || project.workspaceId !== user.workspaceId) return;
 
   const idx = STAGES.indexOf(project.status as (typeof STAGES)[number]);
   const nextIdx = direction === "forward" ? Math.min(idx + 1, STAGES.length - 1) : Math.max(idx - 1, 0);
@@ -27,8 +27,12 @@ export async function logTimeAction(formData: FormData) {
   const user = await getCurrentUser();
   if (!user) return;
   const projectId = String(formData.get("projectId"));
+
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  if (!project || project.workspaceId !== user.workspaceId) return;
+
   await prisma.timeEntry.create({
-    data: { projectId, userId: user.id, minutes: 15 },
+    data: { workspaceId: user.workspaceId, projectId, userId: user.id, minutes: 15 },
   });
   revalidatePath("/projects");
   revalidatePath("/dashboard");
@@ -44,8 +48,11 @@ export async function createProjectAction(_prevState: { error?: string } | undef
 
   if (!clientId || !title) return { error: "Pick a client and add a title." };
 
+  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  if (!client || client.workspaceId !== user.workspaceId) return { error: "Pick a client and add a title." };
+
   await prisma.project.create({
-    data: { clientId, title, dueLabel: dueLabel || null, status: "TODO" },
+    data: { workspaceId: user.workspaceId, clientId, title, dueLabel: dueLabel || null, status: "TODO" },
   });
 
   revalidatePath("/projects");

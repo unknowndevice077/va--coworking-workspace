@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { sendPortalAccessAction } from "./actions";
 import { isMailConfigured } from "@/lib/mailer";
 import { isStripeConfigured } from "@/lib/stripe";
@@ -35,6 +36,9 @@ export default async function ClientDetailPage({
   const { portalEmail, link } = await searchParams;
   const testMode = !isMailConfigured() || !isStripeConfigured();
 
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const client = await prisma.client.findUnique({
     where: { id },
     include: {
@@ -44,7 +48,7 @@ export default async function ClientDetailPage({
     },
   });
 
-  if (!client) notFound();
+  if (!client || client.workspaceId !== user.workspaceId) notFound();
 
   return (
     <div>

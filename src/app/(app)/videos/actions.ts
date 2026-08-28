@@ -23,7 +23,7 @@ export async function createVideoProjectAction(formData: FormData) {
   }
 
   const project = await prisma.videoProject.create({
-    data: { name: "Untitled video", doc: doc as unknown as Prisma.InputJsonValue },
+    data: { workspaceId: user.workspaceId, name: "Untitled video", doc: doc as unknown as Prisma.InputJsonValue },
   });
 
   redirect(`/videos/${project.id}`);
@@ -51,6 +51,9 @@ export async function updateVideoProjectAction(
   const doc = normalizeVideoDoc(parsed);
   if (!doc) return { error: "Couldn't read the video's content." };
 
+  const existing = await prisma.videoProject.findUnique({ where: { id } });
+  if (!existing || existing.workspaceId !== user.workspaceId) return { error: "Video not found." };
+
   await prisma.videoProject.update({
     where: { id },
     data: { name: name || "Untitled video", doc: doc as unknown as Prisma.InputJsonValue },
@@ -67,7 +70,7 @@ export async function deleteVideoProjectAction(formData: FormData) {
   if (!user) redirect("/login");
 
   const id = String(formData.get("id") ?? "");
-  await prisma.videoProject.delete({ where: { id } }).catch(() => {});
+  await prisma.videoProject.deleteMany({ where: { id, workspaceId: user.workspaceId } }).catch(() => {});
   revalidatePath("/videos");
   redirect("/videos");
 }

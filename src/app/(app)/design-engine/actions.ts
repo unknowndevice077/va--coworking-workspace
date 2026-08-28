@@ -56,6 +56,7 @@ export async function createDesignAction(formData: FormData) {
 
   const design = await prisma.design.create({
     data: {
+      workspaceId: user.workspaceId,
       templateId: usedTemplateId,
       name,
       doc: doc as unknown as Prisma.InputJsonValue,
@@ -100,6 +101,7 @@ export async function autoDesignAction(formData: FormData) {
 
   const design = await prisma.design.create({
     data: {
+      workspaceId: user.workspaceId,
       templateId: preset.id,
       name: preset.name,
       doc: doc as unknown as Prisma.InputJsonValue,
@@ -134,6 +136,9 @@ export async function updateDesignAction(
   const doc = normalizeDoc(parsed);
   if (!doc) return { error: "Couldn't read the design's content." };
 
+  const existing = await prisma.design.findUnique({ where: { id } });
+  if (!existing || existing.workspaceId !== user.workspaceId) return { error: "Design not found." };
+
   await prisma.design.update({
     where: { id },
     data: { name: name || "Untitled design", doc: doc as unknown as Prisma.InputJsonValue },
@@ -150,7 +155,7 @@ export async function deleteDesignAction(formData: FormData) {
   if (!user) redirect("/login");
 
   const id = String(formData.get("id") ?? "");
-  await prisma.design.delete({ where: { id } }).catch(() => {});
+  await prisma.design.deleteMany({ where: { id, workspaceId: user.workspaceId } }).catch(() => {});
   revalidatePath("/design-engine/studio");
   redirect("/design-engine/studio");
 }
@@ -173,7 +178,10 @@ export async function sendDesignAction(formData: FormData) {
 
   const design = await prisma.design.findUnique({ where: { id: designId } });
   const doc = design ? normalizeDoc(design.doc) : null;
-  if (!design || !doc) redirect("/design-engine/studio");
+  if (!design || !doc || design.workspaceId !== user.workspaceId) redirect("/design-engine/studio");
+
+  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  if (!client || client.workspaceId !== user.workspaceId) redirect("/design-engine/studio");
 
   await prisma.$transaction([
     prisma.design.update({
@@ -182,6 +190,7 @@ export async function sendDesignAction(formData: FormData) {
     }),
     prisma.designApproval.create({
       data: {
+        workspaceId: user.workspaceId,
         clientId,
         templateId: design.templateId,
         designId: design.id,

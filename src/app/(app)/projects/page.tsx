@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { moveProjectAction, logTimeAction } from "./actions";
 import { IconPlus, IconClock } from "@/components/icons";
 import shell from "@/components/AppShell.module.css";
@@ -13,7 +15,11 @@ const STAGES = [
 ] as const;
 
 export default async function ProjectsPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const projects = await prisma.project.findMany({
+    where: { workspaceId: user.workspaceId },
     include: { client: true, timeEntries: true },
     orderBy: { createdAt: "asc" },
   });
@@ -22,12 +28,12 @@ export default async function ProjectsPage() {
   startOfToday.setHours(0, 0, 0, 0);
   const todaysMinutes = await prisma.timeEntry.aggregate({
     _sum: { minutes: true },
-    where: { date: { gte: startOfToday } },
+    where: { workspaceId: user.workspaceId, date: { gte: startOfToday } },
   });
   const todayHrs = Math.floor((todaysMinutes._sum.minutes ?? 0) / 60);
   const todayMin = (todaysMinutes._sum.minutes ?? 0) % 60;
 
-  const weekMinutes = await prisma.timeEntry.aggregate({ _sum: { minutes: true } });
+  const weekMinutes = await prisma.timeEntry.aggregate({ where: { workspaceId: user.workspaceId }, _sum: { minutes: true } });
   const weekHrs = ((weekMinutes._sum.minutes ?? 0) / 60).toFixed(1);
   const clientCount = new Set(projects.map((p) => p.clientId)).size;
 

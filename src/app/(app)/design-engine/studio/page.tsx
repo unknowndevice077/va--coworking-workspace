@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { DocSurface } from "@/lib/canvas-doc/render";
 import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
@@ -14,9 +16,12 @@ import styles from "../design-engine.module.css";
 // sending snapshots it into a DesignApproval, which shows up under
 // "Finished Designs" once it's gone out.
 export default async function MyDesignsPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const [designs, clients] = await Promise.all([
-    prisma.design.findMany({ orderBy: { updatedAt: "desc" } }),
-    prisma.client.findMany({ orderBy: { name: "asc" } }),
+    prisma.design.findMany({ where: { workspaceId: user.workspaceId }, orderBy: { updatedAt: "desc" } }),
+    prisma.client.findMany({ where: { workspaceId: user.workspaceId }, orderBy: { name: "asc" } }),
   ]);
 
   return (

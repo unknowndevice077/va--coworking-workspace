@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { IconPlus, IconCalendar } from "@/components/icons";
@@ -23,21 +24,23 @@ function badgeClass(status: string) {
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const workspaceId = user.workspaceId;
 
   const [clientCount, openTasks, invoices, events, clients] = await Promise.all([
-    prisma.client.count({ where: { status: { not: "PAUSED" } } }),
-    prisma.project.findMany({ where: { status: { not: "DONE" } }, include: { client: true }, orderBy: { createdAt: "asc" }, take: 4 }),
-    prisma.invoice.findMany({ include: { client: true }, orderBy: { createdAt: "desc" }, take: 3 }),
-    prisma.calendarEvent.findMany({ include: { client: true }, where: { allDay: false }, orderBy: { startHour: "asc" }, take: 3 }),
-    prisma.client.findMany({ where: { status: "ACTIVE" }, orderBy: { createdAt: "asc" }, take: 3 }),
+    prisma.client.count({ where: { workspaceId, status: { not: "PAUSED" } } }),
+    prisma.project.findMany({ where: { workspaceId, status: { not: "DONE" } }, include: { client: true }, orderBy: { createdAt: "asc" }, take: 4 }),
+    prisma.invoice.findMany({ where: { workspaceId }, include: { client: true }, orderBy: { createdAt: "desc" }, take: 3 }),
+    prisma.calendarEvent.findMany({ include: { client: true }, where: { workspaceId, allDay: false }, orderBy: { startHour: "asc" }, take: 3 }),
+    prisma.client.findMany({ where: { workspaceId, status: "ACTIVE" }, orderBy: { createdAt: "asc" }, take: 3 }),
   ]);
 
-  const timeAgg = await prisma.timeEntry.aggregate({ _sum: { minutes: true } });
+  const timeAgg = await prisma.timeEntry.aggregate({ where: { workspaceId }, _sum: { minutes: true } });
   const hoursLogged = ((timeAgg._sum.minutes ?? 0) / 60).toFixed(1);
 
   const revenueAgg = await prisma.invoice.aggregate({
     _sum: { amountCents: true },
-    where: { status: "PAID" },
+    where: { workspaceId, status: "PAID" },
   });
 
   return (

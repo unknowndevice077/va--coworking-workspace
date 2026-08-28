@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { IconPlus } from "@/components/icons";
 import shell from "@/components/AppShell.module.css";
 import ui from "@/components/ui.module.css";
@@ -27,16 +29,19 @@ export default async function ClientsPage({
   searchParams: Promise<{ status?: string; q?: string }>;
 }) {
   const { status = "All", q = "" } = await searchParams;
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
 
   const clients = await prisma.client.findMany({
     where: {
+      workspaceId: user.workspaceId,
       ...(status !== "All" ? { status } : {}),
       ...(q ? { name: { contains: q } } : {}),
     },
     orderBy: { createdAt: "asc" },
   });
 
-  const counts = await prisma.client.groupBy({ by: ["status"], _count: true });
+  const counts = await prisma.client.groupBy({ by: ["status"], _count: true, where: { workspaceId: user.workspaceId } });
   const countOf = (s: string) => counts.find((c) => c.status === s)?._count ?? 0;
 
   return (

@@ -7,7 +7,7 @@ export default async function ClientPortalLayout({ children }: { children: React
   if (!client) redirect("/client/login");
 
   return (
-    <ClientShell clientName={client.name} contactName={client.contactName}>
+    <ClientShell clientName={client.name} contactName={client.contactName} isDemo={client.isDemo}>
       {children}
     </ClientShell>
   );

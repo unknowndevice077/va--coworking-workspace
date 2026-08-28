@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { DocSurface } from "@/lib/canvas-doc/render";
 import { normalizeDoc } from "@/lib/canvas-doc/types";
 import { ScaledCanvas } from "@/components/graphic/ScaledCanvas";
@@ -19,7 +21,11 @@ const STATUS_STYLE: Record<string, CSSProperties> = {
 // still-editable studio; this is the read-only record of what clients
 // have actually seen and how they responded.
 export default async function FinishedDesignsPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const approvals = await prisma.designApproval.findMany({
+    where: { workspaceId: user.workspaceId },
     include: { client: true, design: true, comments: true },
     orderBy: { createdAt: "desc" },
   });

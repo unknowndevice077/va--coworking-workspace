@@ -11,7 +11,10 @@ export async function sendMessageAction(formData: FormData) {
   const body = String(formData.get("body") ?? "").trim();
   if (!body) return;
 
-  await prisma.message.create({ data: { threadId, body, fromVA: true } });
+  const thread = await prisma.messageThread.findUnique({ where: { id: threadId } });
+  if (!thread || thread.workspaceId !== user.workspaceId) return;
+
+  await prisma.message.create({ data: { workspaceId: user.workspaceId, threadId, body, fromVA: true } });
   await prisma.messageThread.update({ where: { id: threadId }, data: { updatedAt: new Date() } });
 
   revalidatePath("/inbox");
