@@ -178,3 +178,29 @@ export function IconX({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconSearch({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+export function IconTrash({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12" />
+    </svg>
+  );
+}
+
+export function IconUpload({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18Z" />
+      <path d="M12 12v6M9.5 14.5 12 12l2.5 2.5" />
+    </svg>
+  );
+}

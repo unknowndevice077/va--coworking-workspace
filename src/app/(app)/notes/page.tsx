@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { NoteForm } from "./NoteForm";
 import { deleteNoteAction } from "./actions";
-import { IconFile } from "@/components/icons";
+import { IconFile, IconSearch, IconTrash } from "@/components/icons";
+import { tintStyle, tintDotStyle, initials } from "@/lib/tint";
 import shell from "@/components/AppShell.module.css";
-import ui from "@/components/ui.module.css";
+import styles from "./notes.module.css";
 
 function timeAgo(date: Date) {
   const mins = Math.round((Date.now() - date.getTime()) / 60000);
@@ -41,6 +42,7 @@ export default async function NotesPage({
   });
 
   const allTags = Array.from(new Set(notes.flatMap((n) => n.tags))).slice(0, 12);
+  const clientCount = new Set(notes.map((n) => n.clientId)).size;
 
   return (
     <div>
@@ -49,73 +51,96 @@ export default async function NotesPage({
           Notes
           <span className={shell.h1sub}>Quick capture per client — ideas, feedback, anything worth remembering.</span>
         </h1>
+        <div className={styles.countPill}>
+          <span className={styles.sw} />
+          {notes.length} {notes.length === 1 ? "note" : "notes"}
+          {clientCount > 0 && ` across ${clientCount} ${clientCount === 1 ? "client" : "clients"}`}
+        </div>
       </div>
 
-      <div className={ui.grid2}>
-        <div className={ui.col}>
-          <div className={ui.panel}>
-            <div className={ui.ph}>
-              <div className={ui.pt}>New note</div>
-            </div>
-            <NoteForm clients={clients.map((c) => ({ id: c.id, name: c.name }))} />
-          </div>
+      <div className={styles.grid}>
+        <div>
+          <NoteForm clients={clients.map((c) => ({ id: c.id, name: c.name }))} />
         </div>
-        <div className={ui.col}>
-          <div className={ui.toolbar}>
-            <form method="get">
-              <input className={ui.search} type="text" name="q" placeholder="Search notes…" defaultValue={q} />
+        <div>
+          <div className={styles.toolbar}>
+            <form method="get" className={styles.searchWrap}>
+              <IconSearch />
+              <input className={styles.searchInput} type="text" name="q" placeholder="Search notes…" defaultValue={q} />
             </form>
-            <Link href="/notes" className={`${ui.chip} ${!clientFilter && !tagFilter ? ui.chipOn : ""}`}>All</Link>
+            <Link href="/notes" className={`${styles.chip} ${!clientFilter && !tagFilter ? styles.chipOn : ""}`}>
+              <span className={styles.sw} style={{ background: !clientFilter && !tagFilter ? "#fff" : "var(--sub)" }} />
+              All
+            </Link>
             {clients.map((c) => (
               <Link
                 key={c.id}
                 href={`/notes?client=${c.id}`}
-                className={`${ui.chip} ${clientFilter === c.id ? ui.chipOn : ""}`}
+                className={`${styles.chip} ${clientFilter === c.id ? styles.chipOn : ""}`}
               >
+                <span className={styles.sw} style={clientFilter === c.id ? { background: "#fff" } : tintDotStyle(c.id)} />
                 {c.name}
               </Link>
             ))}
           </div>
           {allTags.length > 0 && (
-            <div className={ui.tags} style={{ marginBottom: 14 }}>
+            <div className={styles.tagsRow}>
               {allTags.map((t) => (
-                <Link key={t} href={`/notes?tag=${encodeURIComponent(t)}`} className={ui.tag} style={tagFilter === t ? { background: "var(--accent-fill)", color: "#fff" } : undefined}>
+                <Link
+                  key={t}
+                  href={`/notes?tag=${encodeURIComponent(t)}`}
+                  className={styles.tagChip}
+                  style={tagFilter === t ? { background: "var(--accent-fill)", color: "#fff" } : tintStyle(t)}
+                >
                   {t}
                 </Link>
               ))}
             </div>
           )}
 
-          {notes.length === 0 && <div className={ui.empty}>No notes match — try a different filter, or add one on the left.</div>}
-          {notes.map((n) => (
-            <div className={ui.panel} key={n.id} style={{ marginBottom: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 8 }}>
-                <div>
-                  <div className={ui.nm}>{n.client.name}</div>
-                  <div className={ui.meta}>{timeAgo(n.createdAt)}</div>
-                </div>
-                <form action={deleteNoteAction}>
-                  <input type="hidden" name="id" value={n.id} />
-                  <button className={ui.action} type="submit">Delete</button>
-                </form>
-              </div>
-              <p style={{ fontSize: 13.5, lineHeight: 1.6, marginBottom: n.tags.length || n.imageUrl ? 10 : 0 }}>{n.body}</p>
-              {n.imageUrl && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: n.tags.length ? 10 : 0 }}>
-                  <div className={ui.dot}><IconFile /></div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={n.imageUrl} alt="" style={{ maxWidth: 160, maxHeight: 120, borderRadius: 6, border: "1px solid var(--border)" }} />
-                </div>
-              )}
-              {n.tags.length > 0 && (
-                <div className={ui.tags}>
-                  {n.tags.map((t) => (
-                    <span className={ui.tag} key={t}>{t}</span>
-                  ))}
-                </div>
-              )}
+          {notes.length === 0 && (
+            <div className={styles.empty}>
+              <div className={styles.eIcon}><IconFile /></div>
+              <div className={styles.eTitle}>No notes yet</div>
+              <div className={styles.eSub}>Try a different filter, or add one on the left.</div>
             </div>
-          ))}
+          )}
+          <div className={styles.notes}>
+            {notes.map((n) => (
+              <div className={styles.note} key={n.id}>
+                <div className={styles.noteHead}>
+                  <div className={styles.who}>
+                    <div className={styles.avatar} style={tintStyle(n.clientId)}>{initials(n.client.name)}</div>
+                    <div>
+                      <div className={styles.nm}>{n.client.name}</div>
+                      <div className={styles.meta}>{timeAgo(n.createdAt)}</div>
+                    </div>
+                  </div>
+                  <form action={deleteNoteAction}>
+                    <input type="hidden" name="id" value={n.id} />
+                    <button className={styles.delBtn} type="submit">
+                      <IconTrash />
+                      Delete
+                    </button>
+                  </form>
+                </div>
+                <p className={styles.noteBody}>{n.body}</p>
+                {n.imageUrl && (
+                  <div className={styles.noteImgWrap}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={n.imageUrl} alt="" />
+                  </div>
+                )}
+                {n.tags.length > 0 && (
+                  <div className={styles.tagsRow} style={{ marginBottom: 0, marginTop: 10 }}>
+                    {n.tags.map((t) => (
+                      <span className={styles.tagChip} key={t} style={tintStyle(t)}>{t}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
