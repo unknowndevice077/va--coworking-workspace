@@ -24,5 +24,5 @@ export async function loginAction(_prevState: { error?: string } | undefined, fo
   }
 
   await createSession(user.id);
-  redirect("/dashboard");
+  redirect("/clients");
 }

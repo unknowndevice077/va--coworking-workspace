@@ -47,9 +47,6 @@ export default function SignupPage() {
         <p className={styles.hint}>
           Already have an account? <Link href="/login">Sign in →</Link>
         </p>
-        <p className={styles.hint}>
-          Just curious? <Link href="/demo">Try the live client demo →</Link>
-        </p>
       </div>
     </div>
   );

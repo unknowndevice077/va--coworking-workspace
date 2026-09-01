@@ -38,5 +38,5 @@ export async function signupAction(_prevState: { error?: string } | undefined, f
   });
 
   await createSession(user.id);
-  redirect("/dashboard");
+  redirect("/clients");
 }

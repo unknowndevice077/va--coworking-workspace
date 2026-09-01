@@ -7,35 +7,24 @@ import styles from "./AppShell.module.css";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./Logo";
 import {
-  IconHome,
   IconUsers,
-  IconBoard,
   IconSparkle,
-  IconCalendar,
-  IconReceipt,
-  IconInbox,
-  IconGlobe,
-  IconCheck,
-  IconVideo,
   IconFile,
   IconChat,
   IconMenu,
   IconX,
 } from "./icons";
 
+// VA Hub's current product surface: Clients (the record everything else
+// attaches to) plus the four core features. Projects/Calendar/Invoices/
+// Video Studio/Inbox and the client-portal-accounts system (login,
+// messaging, design feedback, Stripe payments, the demo bot) still exist
+// in full — routes, schema, data — just off the promoted nav for now.
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: IconHome },
   { href: "/clients", label: "Clients", icon: IconUsers },
   { href: "/notes", label: "Notes", icon: IconFile },
-  { href: "/projects", label: "Projects", icon: IconBoard },
   { href: "/design-engine", label: "Design Engine", icon: IconSparkle },
-  { href: "/design-engine/sent", label: "Finished Designs", icon: IconCheck },
   { href: "/copy-chat", label: "AI Copy Chat", icon: IconChat },
-  { href: "/videos", label: "Video Studio", icon: IconVideo },
-  { href: "/calendar", label: "Calendar", icon: IconCalendar },
-  { href: "/invoices", label: "Invoices", icon: IconReceipt },
-  { href: "/inbox", label: "Inbox", icon: IconInbox },
-  { href: "/portal", label: "Client Portal", icon: IconGlobe },
 ];
 
 // The canvas and video editors are full-screen workspaces, like Canva's
