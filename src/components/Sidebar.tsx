@@ -17,6 +17,8 @@ import {
   IconGlobe,
   IconCheck,
   IconVideo,
+  IconFile,
+  IconChat,
   IconMenu,
   IconX,
 } from "./icons";
@@ -24,9 +26,11 @@ import {
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: IconHome },
   { href: "/clients", label: "Clients", icon: IconUsers },
+  { href: "/notes", label: "Notes", icon: IconFile },
   { href: "/projects", label: "Projects", icon: IconBoard },
   { href: "/design-engine", label: "Design Engine", icon: IconSparkle },
   { href: "/design-engine/sent", label: "Finished Designs", icon: IconCheck },
+  { href: "/copy-chat", label: "AI Copy Chat", icon: IconChat },
   { href: "/videos", label: "Video Studio", icon: IconVideo },
   { href: "/calendar", label: "Calendar", icon: IconCalendar },
   { href: "/invoices", label: "Invoices", icon: IconReceipt },

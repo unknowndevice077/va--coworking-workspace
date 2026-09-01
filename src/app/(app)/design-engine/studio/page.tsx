@@ -66,6 +66,9 @@ export default async function MyDesignsPage() {
                       {d.status === "SENT" ? "Sent" : "Draft"}
                     </span>
                   </div>
+                  <Link href={`/design-engine/studio/${d.id}/remix`} className={styles.commentCount} style={{ display: "inline-block", margin: "6px 0" }}>
+                    Remix — 3 variations →
+                  </Link>
                   {clients.length > 0 && (
                     <form action={sendDesignAction} className={styles.sendForm}>
                       <input type="hidden" name="designId" value={d.id} />

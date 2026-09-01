@@ -129,6 +129,15 @@ export function IconFile({ className }: IconProps) {
   );
 }
 
+export function IconChat({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4 5h16v11H8l-4 4Z" />
+      <path d="M8 9h8M8 12.5h5" />
+    </svg>
+  );
+}
+
 export function IconSun({ className }: IconProps) {
   return (
     <svg {...base} className={className} strokeWidth={2}>

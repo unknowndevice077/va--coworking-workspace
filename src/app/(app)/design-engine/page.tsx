@@ -25,10 +25,11 @@ export default async function DesignEnginePage({
           <span className={shell.h1sub}>A fully editable canvas, Canva-style — drag, resize, add anything. Nothing reaches a client until you send it.</span>
         </h1>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/design-engine/auto" className={shell.btn}>
+          <Link href="/design-engine/assist" className={shell.btn}>
             <IconSparkle />
-            Auto Design
+            Design Assist
           </Link>
+          <Link href="/design-engine/auto" className={shell.btnGhost}>Auto Design</Link>
           <Link href="/design-engine/studio" className={shell.btnGhost}>My Designs →</Link>
         </div>
       </div>

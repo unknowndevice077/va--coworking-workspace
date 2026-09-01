@@ -34,6 +34,11 @@ model Workspace {
   approvals      DesignApproval[]
   comments       DesignComment[]
   videoProjects  VideoProject[]
+  notes          Note[]
+  moodBoards     MoodBoard[]
+  moodBoardImages MoodBoardImage[]
+  brandVoices    BrandVoice[]
+  drafts         Draft[]
 }
 
 model User {
@@ -82,6 +87,10 @@ model Client {
   threads         MessageThread[]
   files           ClientFile[]
   designApprovals DesignApproval[]
+  notes           Note[]
+  moodBoard       MoodBoard?
+  brandVoice      BrandVoice?
+  drafts          Draft[]
 }
 
 model Project {
@@ -249,4 +258,77 @@ model VideoProject {
   doc         Json
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+// A quick, taggable note against a client — text plus an optional image
+// (src/lib/storage.ts: a real URL if BLOB_READ_WRITE_TOKEN is set, a plain
+// data: URI inline otherwise — either way it just works, no setup required
+// to start capturing notes). `tags` is a native Postgres string array,
+// skipping a separate Tag table per the original scope doc.
+model Note {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  body        String
+  tags        String[]  @default([])
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+}
+
+// One mood board per client — reference colors and images that steer
+// Remix (src/lib/remix.ts) and Auto Design toward a client's established
+// taste instead of a generic template pick.
+model MoodBoard {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String    @unique
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  colors      String[]  @default([])
+  updatedAt   DateTime  @updatedAt
+
+  images MoodBoardImage[]
+}
+
+model MoodBoardImage {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  moodBoardId String
+  moodBoard   MoodBoard @relation(fields: [moodBoardId], references: [id], onDelete: Cascade)
+  url         String
+  createdAt   DateTime  @default(now())
+}
+
+// Per-client brand voice notes, feeding the system prompt AI Copy Chat
+// builds invisibly to the user (src/lib/copy-chat.ts) — tone guidance plus
+// a few sample captions in the client's own voice.
+model BrandVoice {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId       String    @unique
+  client         Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  toneNotes      String    @default("")
+  sampleCaptions String    @default("") // newline-separated; simplest storage for a handful of examples
+  updatedAt      DateTime  @updatedAt
+}
+
+// One AI Copy Chat–generated caption draft. Approved drafts feed back into
+// the system prompt as few-shot examples for that client's next request;
+// rejectReason is captured now so the "flag repeated rejection reasons"
+// retention nudge (scope doc, deferred) has real data to work from later.
+model Draft {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId     String
+  client       Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  prompt       String
+  content      String
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  rejectReason String?
+  createdAt    DateTime  @default(now())
 }
