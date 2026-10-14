@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { sendMail } from "@/lib/mailer";
+import { escapeHtml, sendMail } from "@/lib/mailer";
 import { getAppUrl } from "@/lib/url";
 
 const SETUP_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -27,7 +27,7 @@ export async function sendPortalAccessAction(formData: FormData) {
     const { sent } = await sendMail({
       to: client.contactEmail,
       subject: "Your VA Hub client portal",
-      html: `<p>Hi ${client.contactName},</p><p>Here's your client portal — sign in any time to track projects, message us, review designs, and pay invoices:</p><p><a href="${link}">${link}</a></p>`,
+      html: `<p>Hi ${escapeHtml(client.contactName)},</p><p>Here's your client portal — sign in any time to track projects, message us, review designs, and pay invoices:</p><p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>`,
     });
     outcome = sent ? "sent" : "skipped";
   } else {
@@ -39,7 +39,7 @@ export async function sendPortalAccessAction(formData: FormData) {
     const { sent } = await sendMail({
       to: client.contactEmail,
       subject: `${client.name}, your VA Hub client portal is ready`,
-      html: `<p>Hi ${client.contactName},</p><p>Set up your client portal to track projects, message your VA, review designs, and pay invoices:</p><p><a href="${link}">${link}</a></p><p>This link expires in 7 days.</p>`,
+      html: `<p>Hi ${escapeHtml(client.contactName)},</p><p>Set up your client portal to track projects, message your VA, review designs, and pay invoices:</p><p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p><p>This link expires in 7 days.</p>`,
     });
     outcome = sent ? "sent" : "skipped";
   }

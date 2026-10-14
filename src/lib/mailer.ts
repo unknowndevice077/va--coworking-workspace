@@ -17,6 +17,17 @@ function getResend(): Resend | null {
   return cached;
 }
 
+// For interpolating user-supplied text (names, etc.) into an email's HTML
+// body, so a client named `<a href=...>` can't inject markup into it.
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function sendMail({
   to,
   subject,
